@@ -1,0 +1,9 @@
+---
+name: Bookbag Template
+modules:
+  activate:
+    - overview
+    - prepare-environment
+    - exercises
+    - cleanup
+    - solving-resetting
