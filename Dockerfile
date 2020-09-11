@@ -12,9 +12,9 @@ RUN rm -rf /tmp/src/.git* && \
     chmod -R g+w /tmp/src
 
 # Get OpenShift Client
-RUN wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_RELEASE}/openshift-client-linux-${OCP_CLIENT_RELEASE}.tar.gz && \
-    tar xzf openshift-client-linux-${OCP_CLIENT_RELEASE}.tar.gz -C /opt/workshop/bin && \
-    rm -f openshift-client-linux-${OCP_CLIENT_RELEASE}.tar.gz
+RUN wget -O /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_CLIENT_RELEASE}/openshift-client-linux-${OCP_CLIENT_RELEASE}.tar.gz && \
+    tar xzf /tmp/oc.tar.gz -C /opt/workshop/bin && \
+    rm -f /tmp/oc.tar.gz
 
 USER 1001
 
