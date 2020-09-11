@@ -1,5 +1,5 @@
 :USER_GUID: %guid%
-:USERNAME: %username%
+:USER_NAME: %username%
 :markup-in-source: verbatim,attributes,quotes
 :show_solution: true
 
@@ -26,6 +26,6 @@ Here is some important information about your environment:
 
 Your GUID is: *{USER_GUID}*
 
-Your username is: *{USERNAME}*
+Your username is: *{USER_NAME}*
 
 ----
