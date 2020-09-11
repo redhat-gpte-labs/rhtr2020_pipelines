@@ -6,7 +6,7 @@
 #   split   - Split for two vertically stacked terminals
 #   split/2 - Split twice for three vertically stacked terminals
 #
-#export TERMINAL_TAB='split'
+export TERMINAL_TAB='split'
 
 # Disable OpenShift Console, this is not appropriate for Red Hat Summit as it
 # would point to the wrong cluster.
