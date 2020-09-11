@@ -17,8 +17,7 @@ RUN wget -O /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients
     rm -f /tmp/oc.tar.gz
 
 # Install tkn CLI
-RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/pipeline/0.9.0/tkn-linux-amd64-0.9.0.tar.gz
- && \
+RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/pipeline/0.9.0/tkn-linux-amd64-0.9.0.tar.gz && \
     tar xzf /tmp/tkn.tar.gz -C /opt/workshop/bin && \
     rm -f /tmp/tkn.tar.gz
 
