@@ -1,4 +1,4 @@
-WORKSHOP_NAME=ocp4-disconnected-install
+WORKSHOP_NAME=rhtr2020-ocp4-pipelines
 RESOURCE_BUDGET=medium
 MAX_SESSION_AGE=3600
 IDLE_TIMEOUT=300

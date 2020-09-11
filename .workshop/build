@@ -18,5 +18,5 @@ rm -f Dockerfile README.md LICENSE
 # If the workshop requires Git, it is necessary to set some defaults for
 # the name and email of the user for Git.
 
-git config --global user.email "pavel.anni@gmail.com"
-git config --global user.name "Pavel Anni"
+# git config --global user.email "wkulhane@redhat.com"
+# git config --global user.name "Wolfgang Kulhanek"

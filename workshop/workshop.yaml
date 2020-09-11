@@ -1,5 +1,5 @@
 ---
-name: Bookbag Template
+name: RHTR 2020 OpenShift 4 Pipelines - From Jenkins to Tekton
 modules:
   activate:
     - overview
