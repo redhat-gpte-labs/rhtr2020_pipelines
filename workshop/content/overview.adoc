@@ -1,16 +1,16 @@
-:USER_GUID: %GUID%
-:USERNAME: %USERNAME%
+:USER_GUID: %guid%
+:USERNAME: %username%
 :markup-in-source: verbatim,attributes,quotes
 :show_solution: true
 
 
 == Overview
 
-In this lab, you will deploy Red Hat OpenShift Container Platform 4 using the User Provided Infrastructure method onto Red Hat OpenStack. 
+In this lab, you will deploy Red Hat OpenShift Container Platform 4 using the User Provided Infrastructure method onto Red Hat OpenStack.
 
 // Briefly explain the lab content here
 
-By completing this lab you will achieve the following goals: 
+By completing this lab you will achieve the following goals:
 
 * Learn about the process of OpenShift 4 disconnected installation
 * ....
