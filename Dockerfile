@@ -17,6 +17,10 @@ RUN wget -O /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients
     tar xzf /tmp/oc.tar.gz -C /opt/workshop/bin && \
     rm -f /tmp/oc.tar.gz
 
+# Update ODO Client
+RUN wget -O /opt/app-root/bin/odo https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/odo/v1.2.6/odo-linux-amd64 && \
+    chmod +x /opt/app-root/bin/odo
+
 # Install tkn CLI
 RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/pipeline/${TKN_RELEASE}/tkn-linux-amd64-${TKN_RELEASE}.tar.gz && \
     tar xzf /tmp/tkn.tar.gz -C /opt/app-root/bin && \
