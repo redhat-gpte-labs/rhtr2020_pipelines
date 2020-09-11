@@ -2,6 +2,7 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.0
 
 ENV OCP_CLIENT_RELEASE=4.5.8
 ENV TKN_RELEASE=0.9.0
+ENV ODO_RELEASE=1.2.6
 
 USER root
 
@@ -18,7 +19,7 @@ RUN wget -O /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients
     rm -f /tmp/oc.tar.gz
 
 # Update ODO Client
-RUN wget -O /opt/app-root/bin/odo https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/odo/v1.2.6/odo-linux-amd64 && \
+RUN wget -O /opt/app-root/bin/odo https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/odo/v${ODO_RELEASE}/odo-linux-amd64 && \
     chmod +x /opt/app-root/bin/odo
 
 # Install tkn CLI
