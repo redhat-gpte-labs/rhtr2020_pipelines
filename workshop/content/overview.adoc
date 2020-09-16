@@ -1,5 +1,4 @@
 :USER_GUID: %guid%
-:USER_ID: %username%
 :markup-in-source: verbatim,attributes,quotes
 
 == Overview
@@ -24,5 +23,5 @@ Here is some important information about your environment:
 
 Your GUID is: *{USER_GUID}*
 
-Your username is: *{USER_ID}*
+Your username is: *%username%*
 ----
