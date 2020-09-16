@@ -3,6 +3,7 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.0
 ENV OCP_CLIENT_RELEASE=4.5.8
 ENV TKN_RELEASE=0.9.0
 ENV ODO_RELEASE=1.2.6
+ENV HELM_RELEASE=3.2.3
 
 USER root
 
@@ -27,6 +28,10 @@ RUN wget -O /tmp/odo.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64
 RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/pipeline/${TKN_RELEASE}/tkn-linux-amd64-${TKN_RELEASE}.tar.gz && \
     tar xzf /tmp/tkn.tar.gz -C /opt/app-root/bin && \
     rm -f /tmp/tkn.tar.gz
+
+# Install Helm
+RUN wget -O /opt/app-root-bin/helm https://mirror.openshift.com/pub/openshift-v4/clients/helm/${HELM_RELEASE}/helm-linux-amd64 && \
+    chmod 775 /opt/app-root-bin/helm
 
 USER 1001
 
