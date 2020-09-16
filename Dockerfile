@@ -30,8 +30,8 @@ RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/client
     rm -f /tmp/tkn.tar.gz
 
 # Install Helm
-RUN wget -O /opt/app-root-bin/helm https://mirror.openshift.com/pub/openshift-v4/clients/helm/${HELM_RELEASE}/helm-linux-amd64 && \
-    chmod 775 /opt/app-root-bin/helm
+RUN wget -O /opt/app-root/bin/helm https://mirror.openshift.com/pub/openshift-v4/clients/helm/${HELM_RELEASE}/helm-linux-amd64 && \
+    chmod 775 /opt/app-root/bin/helm
 
 USER 1001
 
