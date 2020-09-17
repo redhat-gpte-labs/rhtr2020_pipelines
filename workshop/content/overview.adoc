@@ -1,4 +1,5 @@
-:USER_GUID: %guid%
+:GUID: %guid%
+:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
 
 == Overview
@@ -21,7 +22,7 @@ Here is your user information:
 ----
 Here is some important information about your environment:
 
-Your GUID is: *{USER_GUID}*
+Your GUID is: *{GUID}*
 
-Your username is: *%username%*
+Your username is: *{OCP_USERNAME}*
 ----
