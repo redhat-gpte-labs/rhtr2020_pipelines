@@ -1,0 +1,14 @@
+:GUID: %guid%
+:OCP_USERNAME: %ocp_username%
+:markup-in-source: verbatim,attributes,quotes
+
+== Run the OpenShift Pipeline
+
+Overview
+
+. Step 1
+. Step 2
+
+=== Summary
+
+Here's what you did.

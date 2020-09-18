@@ -1,17 +1,14 @@
-:USER_GUID: %GUID%
-:USERNAME: %USERNAME%
+:GUID: %guid%
+:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
-:show_solution: true
 
-== Prepare Environment
+== Run the Jenkins Pipeline
 
-// Describe the steps the student has to perform to prepare for the lab exercises
+Overview.
 
-To prepare the environment for the lab exercises complete the following steps.
+. Open Jenkins ...
 
-. Install ...
-
-. Configure ...
+. Launch task ...
 
 . Use the following commands:
 +
@@ -23,7 +20,7 @@ $ *source $HOME/.bashrc*
 ----
 
 
-Congratulations! This was a long phase, but you are finished with your preparation work.
+=== Summary
 
 You have completed the following:
 

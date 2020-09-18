@@ -2,16 +2,16 @@
 modules:
   overview:
     name: Workshop Overview
-    exit_sign: Prepare Environment
-  prepare-environment:
-    name: Prepare Environment
-    exit_sign: Lab Exercises
-  exercises:
-    name: Lab Exercises
-    exit_sign: Cleanup
-  cleanup:
-    name: Cleanup
-    exit_sign: Resetting and Solving
-  solving-resetting:
-    name: Resetting and Solving
+    exit_sign: Execute Jenkins Pipeline
+  run_jenkins_pipeline:
+    name: Execute Jenkins Pipeline
+    exit_sign: Create OpenShift Pipeline
+  create_tekton_pipeline:
+    name: Create OpenShift Pipeline
+    exit_sign: Run OpenShift Pipeline
+  run_tekton_pipeline:
+    name: Run OpenShift Pipeline
+    exit_sign: Add Webhook
+  add_webhook:
+    name: Add Webhook
     exit_sign: Finish Workshop

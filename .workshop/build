@@ -20,3 +20,5 @@ rm -f Dockerfile README.md LICENSE
 
 # git config --global user.email "wkulhane@redhat.com"
 # git config --global user.name "Wolfgang Kulhanek"
+
+mv yaml_manifests /opt/app-root-src

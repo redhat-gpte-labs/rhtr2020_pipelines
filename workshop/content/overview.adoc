@@ -4,25 +4,33 @@
 
 == Overview
 
-In this lab, you will deploy Red Hat OpenShift Container Platform 4 using the User Provided Infrastructure method onto Red Hat OpenStack.
-
-// Briefly explain the lab content here
+In this lab, you will convert an existing Jenkins pipeline into an OpenShift pipeline based on Tekton.
 
 By completing this lab you will achieve the following goals:
 
-* Learn about the process of OpenShift 4 disconnected installation
-* ....
-* ....
+* Run a Jenkins pipeline
+* Examine the Jenkins pipeline logic
+* Convert the Jenkins pipeline into OpenShift pipeline
+* Test the various steps that make up the OpenShift pipeline
+* Execute the entire OpenShift pipeline
+* Add a trigger to the source code repository to automatically kick off a pipeline when new code is being pushed into the source code repository
 
 == User Information
 
-Here is your user information:
-
-[source,bash,options="nowrap",subs="{markup-in-source}"]
-----
+[NOTE]
+====
 Here is some important information about your environment:
 
 Your GUID is: *{GUID}*
+Your OpenShift and Gitea username is: *{OCP_USERNAME}*
+Your OpenShift password is your OpenTLC Password
+Your Gitea password is %gitea_password%
 
-Your username is: *{OCP_USERNAME}*
-----
+To log into OpenShift use the following command: *%login_command%*
+The OpenShift Web Console is at: *%web_console_url%*
+
+Gitea: %gitea_url%
+Jenkins: %jenkins_url%
+Nexus: %nexus_url%
+ArgoCD: %argocd_url%
+====

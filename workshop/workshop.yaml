@@ -1,9 +1,9 @@
 ---
-name: RHTR 2020 OpenShift 4 Pipelines - From Jenkins to Tekton
+name: RHTR 2020 OpenShift 4 Pipelines
 modules:
   activate:
     - overview
-    - prepare-environment
-    - exercises
-    - cleanup
-    - solving-resetting
+    - run_jenkins_pipeline
+    - create_tekton_pipeline
+    - run_tekton_pipeline
+    - add_webhook

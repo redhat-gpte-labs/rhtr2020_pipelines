@@ -1,0 +1,28 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: openshift-client
+spec:
+  params:
+  - default: oc $@
+    description: The OpenShift CLI arguments to run
+    name: SCRIPT
+    type: string
+  - default:
+    - help
+    description: The OpenShift CLI arguments to run
+    name: ARGS
+    type: array
+  resources:
+    inputs:
+    - name: source
+      optional: true
+      type: git
+  steps:
+  - args:
+    - $(params.ARGS)
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+    name: oc
+    resources: {}
+    script: $(params.SCRIPT)
