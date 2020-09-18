@@ -21,16 +21,16 @@ By completing this lab you will achieve the following goals:
 ====
 Here is some important information about your environment:
 
-Your GUID is: *{GUID}*
-Your OpenShift and Gitea username is: *{OCP_USERNAME}*
-Your OpenShift password is your OpenTLC Password
-Your Gitea password is %gitea_password%
+* Your GUID is: *{GUID}*
+* Your OpenShift and Gitea username is: *{OCP_USERNAME}*
+* Your OpenShift password is your OpenTLC Password
+* Your Gitea password is %gitea_password%
 
-To log into OpenShift use the following command: *%login_command%*
-The OpenShift Web Console is at: *%web_console_url%*
+* To log into OpenShift use the following command: *%login_command%*
+* The OpenShift Web Console is at: *%web_console_url%*
 
-Gitea: %gitea_url%
-Jenkins: %jenkins_url%
-Nexus: %nexus_url%
-ArgoCD: %argocd_url%
+* Gitea: %gitea_url%
+* Jenkins: %jenkins_url%
+* Nexus: %nexus_url%
+* ArgoCD: %argocd_url%
 ====
