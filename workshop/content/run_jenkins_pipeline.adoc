@@ -1,12 +1,18 @@
-:GUID: %guid%
-:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
 
 == Run the Jenkins Pipeline
 
-Overview.
+In this section of the lab you will examine the Jenkins Pipeline and - if you want to - execute the pipeline.
 
-. Open Jenkins ...
+. Open your web browser and navigate to Jenkins at %jenkins_url%.
+. Click the blue *Login to OpenShift* button to log into Jenkins. ... Use %ocp_username% and your OpenTLC password as credentials.
+.. Accept the request for permissions
+. On the Jenkins Overview page you will see a folder, *jenkins*. Open the folder by clicking on the name.
+. You will see a Jenkins task *jenkins/petclinic-pipeline*. Open the task by clicking on it.
++
+[NOTE]
+Note that you do not have permissions to start the Jenkins task from the Jenkins User Interface. This is because you only have
+
 
 . Launch task ...
 
