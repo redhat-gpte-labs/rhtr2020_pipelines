@@ -1,9 +1,10 @@
 ---
-name: RHTR 2020 OpenShift 4 Pipelines
+name: RHTR 2020 Pipelines
 modules:
   activate:
-    - overview
-    - run_jenkins_pipeline
-    - create_tekton_pipeline
-    - run_tekton_pipeline
-    - add_webhook
+  - overview
+  - user_information
+  - run_jenkins_pipeline
+  - create_tekton_pipeline
+  - run_tekton_pipeline
+  - add_webhook

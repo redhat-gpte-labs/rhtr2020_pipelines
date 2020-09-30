@@ -7,14 +7,51 @@ In this section of the lab you will examine the Jenkins Pipeline and - if you wa
 . Open your web browser and navigate to Jenkins at %jenkins_url%.
 . Click the blue *Login to OpenShift* button to log into Jenkins. ... Use %ocp_username% and your OpenTLC password as credentials.
 .. Accept the request for permissions
-. On the Jenkins Overview page you will see a folder, *jenkins*. Open the folder by clicking on the name.
-. You will see a Jenkins task *jenkins/petclinic-pipeline*. Open the task by clicking on it.
+. On the Jenkins Overview page you will see a folder, *jenkins-%guid%*. Open the folder by clicking on the name.
+. You will see a Jenkins task *jenkins-%guid%/petclinic-pipeline*. Open the task by clicking on it.
+. On the left click on *Configure* to see the task definition.
+.. Notice the 4 parameters that are passed into the pipeline:
+* *REPO* (your source code repository for the application you are buildling)
+* *PROD_PROJECT*: the name of the project that will hold the production code
+* *GITSECRET*: the name of the secret in your Jenkins project that holds the credentials for your _private_ source code repository
+* *DEV_PROJECT*: the name of the development project
+
+. Scroll down further and examine the Jenkins pipeline. Notice the following:
+* The pipeline specifies an agent with label *maven*. This agent pod will execute the pipeline.
+* Under *stages* you will find all the stages that make up the pipeline. In each stage you will find a sequence of steps that make up this stage.
+* The _Build App_ stage checks out the source code from your private source code repository and uses `mvn install -DskipTests=true` to build the application jar file.
+* The _Test_ stage runs `mvn test` and then archives the test results. This makes the test results available on the overview page of your task in Jenkins.
+* Stage _Create Builder_ is a bit more complicated. Let's see what's going on:
+** First the expression checks if the build configuration *petclinic* exists in your development project.
+** If the build configuration does _not_ exists the steps are executed to create a new build configuration of type *binary* with the name *petclinic* using builder image `redhat-openjdk18-openshift:1.8`
+* Stage _Build Image_ renames the jar file that you previously built in stage _Build App_ to the name `petclinic.jar` - and then starts the binary build to create the container image for the application. Note the `--wait=true` section: this ensures that this step blocks until the build has finished.
+* Stage _Create DeploymentConfig for DEV_ again is a more complicated stage:
+** It once again checks if the deployment configuration already exists in the development project. And if it doesn't it creates it using the container image that was just built in the previous step (`petclinic:latest`).
+** `expose` creates a route from the service that the `newApp` step created.
+** Then it waits until the application has been rolled out by comparing `.spec.replicas` with `.status.readyReplicas` in the deployment configuration object. Note that this logic uses `.object()` to get the current version of the deployment config object. Otherwise it would just keep comparing the state of the object as it was when the variable `dc` was created.
+** This stage also sets the triggers in the deployment configuration to *manual* to prevent future automatic deployments and sets a variable to let the next stage (rollout) know that it can be skipped.
+** And finally a variable, `devProjectIsNew`, is set to signal that the application has just been deployed. This will prevent a double deploy in the next stage.
+* Stage _Deploy Dev_ checks if the project has just been set up. If so there is no need to run a deploy because the previous state already deployed the latest version of the application. It this is the second or higher time the pipeline is run then the previous stage will have been skipped - and it is necessary to roll out (redeploy) the application using the latest container image.
+* Stage _Promote to Prod?_ tags the image with the `prod` tag.
+* Stage _Create DeploymentConfig for PROD_ is similar to the stage that set up the application for the development project.
+* Stage _Deploy PROD_ finally is similar to the stage that deployed the application into the development project - except this time it deploys into the production project.
+. Now that you know what the pipeline does it's time to run the pipeline.
 +
-[NOTE]
-Note that you do not have permissions to start the Jenkins task from the Jenkins User Interface. This is because you only have
+At the top of your screen in the breadcrumb section select the *jenkins-%guid%/petclinic-pipeline* link to get back to the task overview.
+. On the left click *Build with Parameters* to kick off a new build. The parameters are already pre-populated so all you have to do is click on the blue *Build* button to kick off a build. You can follow along as the build progresses until it finishes about 4 minutes later. 
 
 
-. Launch task ...
+
+
+
+
+
+
+
+
+
+
+
 
 . Use the following commands:
 +

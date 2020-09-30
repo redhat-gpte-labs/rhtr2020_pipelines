@@ -2,7 +2,7 @@
 
 == Overview
 
-Welcome to Red Hat Tech Ready 2020!
+*Welcome to Red Hat Tech Ready 2020 and the Pipelines - from Jenkins to OpenShift Pipelines lab!*
 
 Jenkins has been the de-facto standard for CI/CD for multiple years now. In recent additions Jenkins gained the capability to build pipelines, first in Groovy, then in declarative syntax.
 
@@ -43,23 +43,3 @@ By completing this lab you will achieve the following goals:
 * Test the various tasks that make up the OpenShift pipeline
 * Execute the entire OpenShift pipeline
 * Add a trigger to the source code repository to automatically kick off a pipeline when new code is being pushed into the source code repository
-
-== User Information
-
-[NOTE]
-====
-Here is some important information about your environment:
-
-* Your GUID is: *%guid%*
-* Your OpenShift and Gitea username is: *%ocp_username%*
-* Your OpenShift password is your OpenTLC Password
-* Your Gitea password is %gitea_password%
-
-* To log into OpenShift use the following command: *%login_command%*
-* The OpenShift Web Console is at: *%web_console_url%*
-
-* Gitea: %gitea_url%
-* Jenkins: %jenkins_url%
-* Nexus: %nexus_url%
-* ArgoCD: %argocd_url%
-====

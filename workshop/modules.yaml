@@ -2,13 +2,16 @@
 modules:
   overview:
     name: Workshop Overview
-    exit_sign: Execute Jenkins Pipeline
+    exit_sign: Information about your environment
+  user_information:
+    name: Information about your environment
+    exit_sign: Execute Jenkins pipeline
   run_jenkins_pipeline:
-    name: Execute Jenkins Pipeline
-    exit_sign: Create OpenShift Pipeline
+    name: Execute Jenkins pipeline
+    exit_sign: Create OpenShift pipeline
   create_tekton_pipeline:
-    name: Create OpenShift Pipeline
-    exit_sign: Run OpenShift Pipeline
+    name: Create OpenShift pipeline
+    exit_sign: Run OpenShift pipeline
   run_tekton_pipeline:
     name: Run OpenShift Pipeline
     exit_sign: Add Webhook
