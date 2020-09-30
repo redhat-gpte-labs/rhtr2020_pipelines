@@ -25,7 +25,43 @@ Here is some important information about your environment:
 ** *jenkins-%guid%*: Jenkins Project with a running Jenkins and an OpenShift build configuration of type `JenkinsPipeline` that holds the Jenkins Pipeline that you will translate into an OpenShift pipeline
 ** *petclinic-jenkins-%guid%-dev*: Development Project to be used by Jenkins
 ** *petclinic-jenkins-%guid%-prod*: Production Project to be used by Jenkins
-** *pipeline-%guid%: A project to hold the resources that will make up your OpenShift pipeline
+** *pipeline-%guid%*: A project to hold the resources that will make up your OpenShift pipeline
 ** *petclinic-%guid%-dev*: Development Project to be used by your OpenShift pipeline
 ** *petclinic-%guid%-prod*: Production Project to be used by your OpenShift pipeline
 
+== Log into OpenShift
+
+For the labs to work you need to log into OpenShift in the terminal to the right using your OpenTLC ID. You can click the command below if you don't feel like typing it. But regardless you will need to accept the insecure connection warning and then provide your OpenTLC password.
+
+[source,bash,role=execute]
+----
+%login_command%
+----
++
+.Sample Output
+[source,options="nowrap",subs="{markup-in-source}"]
+----
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n): y
+
+Authentication required for https://api.cluster-wkrhtr.red.osp.opentlc.com:6443 (openshift)
+Username: wkulhane-redhat.com
+Password:
+Login successful.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * bookbag-wk
+    jenkins-wk
+    petclinic-jenkins-wk-dev
+    petclinic-jenkins-wk-prod
+    petclinic-wk-dev
+    petclinic-wk-prod
+    pipeline-wk
+
+Using project "bookbag-wk".
+----
+
+[TIP]
+You can always come back to this page if you need a reminder of any of your lab information. But once you have logged into OpenShift the rest of the lab instructions should have the correct values.
