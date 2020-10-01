@@ -37,7 +37,7 @@ For the labs to work you need to log into OpenShift in the terminal to the right
 ----
 %login_command%
 ----
-+
+
 .Sample Output
 [source,options="nowrap",subs="{markup-in-source}"]
 ----

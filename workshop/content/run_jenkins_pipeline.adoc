@@ -5,7 +5,7 @@
 In this section of the lab you will examine the Jenkins Pipeline and - if you want to - execute the pipeline.
 
 . Open your web browser and navigate to Jenkins at %jenkins_url%.
-. Click the blue *Login to OpenShift* button to log into Jenkins. ... Use %ocp_username% and your OpenTLC password as credentials.
+. Click the blue *Login to OpenShift* button to log into Jenkins. ... Use *%ocp_username%* and your OpenTLC password as credentials.
 .. Accept the request for permissions
 . On the Jenkins Overview page you will see a folder, *jenkins-%guid%*. Open the folder by clicking on the name.
 . You will see a Jenkins task *jenkins-%guid%/petclinic-pipeline*. Open the task by clicking on it.
@@ -13,7 +13,7 @@ In this section of the lab you will examine the Jenkins Pipeline and - if you wa
 .. Notice the 4 parameters that are passed into the pipeline:
 * *REPO* (your source code repository for the application you are buildling)
 * *PROD_PROJECT*: the name of the project that will hold the production code
-* *GITSECRET*: the name of the secret in your Jenkins project that holds the credentials for your _private_ source code repository
+* *GITSECRET*: the name of the secret in your Jenkins project that holds the credentials for your _private_ source code repository in Gitea
 * *DEV_PROJECT*: the name of the development project
 
 . Scroll down further and examine the Jenkins pipeline. Notice the following:
