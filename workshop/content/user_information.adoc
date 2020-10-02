@@ -31,20 +31,16 @@ Here is some important information about your environment:
 
 == Log into OpenShift
 
-For the labs to work you need to log into OpenShift in the terminal to the right using your OpenTLC ID. You can click the command below if you don't feel like typing it. But regardless you will need to accept the insecure connection warning and then provide your OpenTLC password.
+For the labs to work you need to log into OpenShift in the terminal to the right using your OpenTLC ID. You can click the command below if you don't feel like typing it. But regardless you will need to provide your OpenTLC password.
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-%login_command%
+%login_command% --insecure-skip-tls-verify=true
 ----
 
 .Sample Output
 [source,options="nowrap",subs="{markup-in-source}"]
 ----
-The server uses a certificate signed by an unknown authority.
-You can bypass the certificate check, but any data you send to the server could be intercepted by others.
-Use insecure connections? (y/n): y
-
 Authentication required for https://api.cluster-wkrhtr.red.osp.opentlc.com:6443 (openshift)
 Username: wkulhane-redhat.com
 Password:

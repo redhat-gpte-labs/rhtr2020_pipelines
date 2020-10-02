@@ -54,7 +54,10 @@ oc get pod -n petclinic-jenkins-%guid%-dev
 .Sample Output
 [source,texinfo]
 ----
-
+NAME                 READY   STATUS      RESTARTS   AGE
+petclinic-1-build    0/1     Completed   0          18m
+petclinic-1-c77xt    1/1     Running     0          17m
+petclinic-1-deploy   0/1     Completed   0          17m
 ----
 
 . Find the route for the application in your development 
@@ -67,34 +70,43 @@ oc get route -n petclinic-jenkins-%guid%-dev
 .Sample Output
 [source,texinfo]
 ----
-
+NAME        HOST/PORT                                                                    PATH   SERVICES    PORT
+ TERMINATION   WILDCARD
+petclinic   petclinic-petclinic-jenkins-wk-dev.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+               None
 ----
 
-
-
-
-
-
-
-
-
-
-
-
-. Use the following commands:
+. Use the route (`petclinic-petclinic-jenkins-wk-dev.apps.cluster-wkrhtr.red.osp.opentlc.com` in the example above in a web browser to validate that the application is working.)
+. Also check that the production application is working. First check that the pod is running in your production project (note that you will not see a build pod in this project - you only build the container image in the development project):
 +
-[source,options="nowrap",subs="{markup-in-source}"]
+[source,bash,subs="{markup-in-source}",role=execute]
 ----
-$ *ansible localhost -m lineinfile -a 'path=$HOME/.bashrc regexp="^export OCP_RELEASE" line="export OCP_RELEASE=4.3.1"'*
-
-$ *source $HOME/.bashrc*
+oc get pod -n petclinic-jenkins-%guid%-prod
+----
++
+.Sample Output
+[source,texinfo]
+----
+NAME                 READY   STATUS      RESTARTS   AGE
+petclinic-1-8nrnc    1/1     Running     0          21m
+petclinic-1-deploy   0/1     Completed   0          21m
 ----
 
+. Retrieve the route for the production application.
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc get route -n petclinic-jenkins-%guid%-prod
+----
++
+.Sample Output
+[source,texinfo]
+----
+NAME        HOST/PORT                                                                     PATH   SERVICES    PORT
+  TERMINATION   WILDCARD
+petclinic   petclinic-petclinic-jenkins-wk-prod.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+                None
+----
+. Then check that application as well.
 
-=== Summary
-
-You have completed the following:
-
-* Deployed ...
-* Created ...
-* Customized ...
+Now that you have validated that everything is working as designed you are ready to convert the Jenkins pipeline into an OpenShift pipeline.
