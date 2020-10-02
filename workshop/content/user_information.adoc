@@ -33,7 +33,7 @@ Here is some important information about your environment:
 
 For the labs to work you need to log into OpenShift in the terminal to the right using your OpenTLC ID. You can click the command below if you don't feel like typing it. But regardless you will need to accept the insecure connection warning and then provide your OpenTLC password.
 
-[source,bash,role=execute]
+[source,bash,subs="{markup-in-source}",role=execute]
 ----
 %login_command%
 ----

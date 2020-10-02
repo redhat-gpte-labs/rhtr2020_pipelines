@@ -40,7 +40,35 @@ In this section of the lab you will examine the Jenkins Pipeline and - if you wa
 At the top of your screen in the breadcrumb section select the *jenkins-%guid%/petclinic-pipeline* link to get back to the task overview.
 . On the left click *Build with Parameters* to kick off a new build. The parameters are already pre-populated so all you have to do is click on the blue *Build* button to kick off a build. You can follow along as the build progresses until it finishes about 4 minutes later. 
 
+=== Access the application
 
+When you ran the Jenkins pipeline this was the first time that it ran. Therefore it created all the resources that it needed to deploy the application to both the development and production projects. Let's check out these applications.
+
+. Make sure the application is running in your development project
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc get pod -n petclinic-jenkins-%guid%-dev
+----
++
+.Sample Output
+[source,texinfo]
+----
+
+----
+
+. Find the route for the application in your development 
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc get route -n petclinic-jenkins-%guid%-dev
+----
++
+.Sample Output
+[source,texinfo]
+----
+
+----
 
 
 
