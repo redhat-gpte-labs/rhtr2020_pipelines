@@ -1,0 +1,119 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: petclinic-pipeline
+spec:
+  params:
+    - default: spring-petclinic
+      description: The application deployment name
+      name: APP_NAME
+      type: string
+    - default: >-
+        https://github.com/spring-projects/spring-petclinic.git
+      description: The application git repository url
+      name: APP_GIT_URL
+      type: string
+    - default: main
+      description: The application git repository revision
+      name: APP_GIT_REVISION
+      type: string
+    - default: 'spring-petclinic:latest'
+      description: The application image stream
+      name: APP_IMAGE_STREAM
+      type: string
+    - default: petclinic-dev
+      name: DEV_NAMESPACE
+      type: string
+    - default: petclinic-prod
+      name: PROD_NAMESPACE
+      type: string
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: $(params.APP_GIT_URL)
+        - name: revision
+          value: $(params.APP_GIT_REVISION)
+        - name: deleteExisting
+          value: 'true'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: app-source
+    - name: run-test
+      params:
+        - name: GOALS
+          value:
+            - package
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: app-source
+        - name: maven-settings
+          workspace: maven-settings
+    - name: build-image
+      params:
+        - name: TLSVERIFY
+          value: 'false'
+        - name: OUTPUT_IMAGE_STREAM
+          value: $(params.APP_IMAGE_STREAM)
+        - name: NAMESPACE
+          value: $(params.DEV_NAMESPACE)
+      runAfter:
+        - run-test
+      taskRef:
+        kind: Task
+        name: s2i-java-11-binary-namespace
+      workspaces:
+        - name: source
+          workspace: app-source
+    - name: deploy-to-dev
+      params:
+        - name: DEPLOYMENT
+          value: $(params.APP_NAME)
+        - name: IMAGE_STREAM
+          value: $(params.APP_IMAGE_STREAM)
+        - name: NAMESPACE
+          value: $(params.DEV_NAMESPACE)
+      runAfter:
+        - build-image
+      taskRef:
+        kind: Task
+        name: deploy-to-project
+    - name: promote-to-prod
+      params:
+        - name: IMAGE_STREAM
+          value: $(params.APP_IMAGE_STREAM)
+        - name: DEPLOYMENT
+          value: $(params.APP_NAME)
+        - name: DEV_NAMESPACE
+          value: $(params.DEV_NAMESPACE)
+        - name: PROD_NAMESPACE
+          value: $(params.PROD_NAMESPACE)
+      runAfter:
+        - deploy-to-dev
+      taskRef:
+        kind: Task
+        name: promote-to-prod
+    - name: deploy-to-prod
+      params:
+        - name: DEPLOYMENT
+          value: $(params.APP_NAME)
+        - name: IMAGE_STREAM
+          value: '$(params.APP_NAME):prod'
+        - name: NAMESPACE
+          value: $(params.PROD_NAMESPACE)
+      runAfter:
+        - promote-to-prod
+      taskRef:
+        kind: Task
+        name: deploy-to-project
+  workspaces:
+    - name: app-source
+    - name: maven-settings

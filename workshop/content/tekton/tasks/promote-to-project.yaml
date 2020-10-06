@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: promote-to-prod
+spec:
+  params:
+    - name: IMAGE_STREAM
+      type: string
+    - name: DEPLOYMENT
+      type: string
+    - name: DEV_NAMESPACE
+      type: string
+    - name: PROD_NAMESPACE
+      type: string
+  steps:
+    - image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+      name: deploy
+      resources: {}
+      script: >
+        #!/usr/bin/env bash
+
+
+        set -x
+
+        oc tag $(params.DEV_NAMESPACE)/$(params.IMAGE_STREAM)  $(params.PROD_NAMESPACE)/$(params.DEPLOYMENT):prod   

@@ -32,13 +32,15 @@ In this section of the lab you will examine the Jenkins Pipeline and - if you wa
 ** This stage also sets the triggers in the deployment configuration to *manual* to prevent future automatic deployments and sets a variable to let the next stage (rollout) know that it can be skipped.
 ** And finally a variable, `devProjectIsNew`, is set to signal that the application has just been deployed. This will prevent a double deploy in the next stage.
 * Stage _Deploy Dev_ checks if the project has just been set up. If so there is no need to run a deploy because the previous state already deployed the latest version of the application. It this is the second or higher time the pipeline is run then the previous stage will have been skipped - and it is necessary to roll out (redeploy) the application using the latest container image.
-* Stage _Promote to Prod?_ tags the image with the `prod` tag.
+* Stage _Promote to Prod_ tags the image with the `prod` tag.
 * Stage _Create DeploymentConfig for PROD_ is similar to the stage that set up the application for the development project.
 * Stage _Deploy PROD_ finally is similar to the stage that deployed the application into the development project - except this time it deploys into the production project.
 . Now that you know what the pipeline does it's time to run the pipeline.
 +
 At the top of your screen in the breadcrumb section select the *jenkins-%guid%/petclinic-pipeline* link to get back to the task overview.
 . On the left click *Build with Parameters* to kick off a new build. The parameters are already pre-populated so all you have to do is click on the blue *Build* button to kick off a build. You can follow along as the build progresses until it finishes about 4 minutes later. 
+
+image::images/jenkins_petclinic_pipeline.png[Jenkins Pipeline]
 
 === Access the application
 

@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-to-project
+spec:
+  params:
+    - name: DEPLOYMENT
+      type: string 
+    - name: IMAGE_STREAM
+      type: string
+    - name: NAMESPACE
+      type: string
+  steps:
+    - image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+      name: deploy
+      resources: {}
+      script: >
+        #!/usr/bin/env bash
+
+
+        set -x
+
+        image_ref="image-registry.openshift-image-registry.svc:5000/$(params.NAMESPACE)/$(params.IMAGE_STREAM)"
+
+        echo "Deploying $image_ref"
+
+        deployment=`oc get deployment $(params.DEPLOYMENT) -n $(params.NAMESPACE)`
+
+        if [ $? -ne 0 ]; then
+          oc new-app $(params.IMAGE_STREAM) --name $(params.DEPLOYMENT) -n $(params.NAMESPACE)
+          oc expose svc/$(params.DEPLOYMENT) -n $(params.NAMESPACE)
+        else
+          oc set image deployment/$(params.DEPLOYMENT) $(params.DEPLOYMENT)=$image_ref -n $(params.NAMESPACE)
+          oc patch deployment $(params.DEPLOYMENT) -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}" -n $(params.NAMESPACE)
+          oc rollout status deployment/$(params.DEPLOYMENT) -n $(params.NAMESPACE)
+        fi
