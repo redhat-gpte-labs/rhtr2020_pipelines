@@ -4,7 +4,7 @@ metadata:
   name: petclinic-pipeline
 spec:
   params:
-    - default: spring-petclinic
+    - default: petclinic
       description: The application deployment name
       name: APP_NAME
       type: string
@@ -17,7 +17,7 @@ spec:
       description: The application git repository revision
       name: APP_GIT_REVISION
       type: string
-    - default: 'spring-petclinic:latest'
+    - default: 'petclinic:latest'
       description: The application image stream
       name: APP_IMAGE_STREAM
       type: string

@@ -38,7 +38,7 @@ In order to achieve that, we will refactor all the steps from our original Pipel
 
 image::images/jenkins_to_tekton_diagram.png[Jenkins to Tekton]
 
-Let's use our Pipeline project pipeline-%guid% :
+Let's use our Pipeline project *pipeline-%guid%* :
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
@@ -68,11 +68,22 @@ All the other `Stages` will be converted with some custom `Tasks` we are going t
 * *promote-to-prod*: a Task to tag our _dev_ image to _prod_ thus promoting it to the _prod_ project 
 * *deploy-to-project*: a Task to deploy an existing container image to a target project. We will use it to deploy the app to our _dev_ and _prod_ environments
 
-Let's create them:
+Let's create them.
+
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-oc create -f https://raw.githubusercontent.com/rhtr2020_pipelines/master/workshop/content/tekton/tasks/ -n pipeline-%guid%
+oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/tasks/s2i-java-11-binary-ns.yaml -n pipeline-%guid%
+----
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/tasks/promote-to-project.yaml -n pipeline-%guid%
+----
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/tasks/deploy-to-project.yaml -n pipeline-%guid%
 ----
 
 Now let's review the 3 tasks we just created:
@@ -98,7 +109,7 @@ Let's explore them, you can do this either from link:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-oc get Tasks -o yaml -n -n pipeline-%guid%
+oc get Tasks -o yaml -n pipeline-%guid%
 ----
 
 You can do the same thing for the ClusterTasks:
@@ -125,7 +136,7 @@ metadata:
   name: petclinic-pipeline
 spec:
   params:
-    - default: spring-petclinic
+    - default: petclinic
       description: The application deployment name
       name: APP_NAME
       type: string
@@ -138,14 +149,14 @@ spec:
       description: The application git repository revision
       name: APP_GIT_REVISION
       type: string
-    - default: 'spring-petclinic:latest'
+    - default: 'petclinic:latest'
       description: The application image stream
       name: APP_IMAGE_STREAM
       type: string
     - default: petclinic-%guid%-dev
       name: DEV_NAMESPACE
       type: string
-    - default: petclinic-%guid-prod
+    - default: petclinic-%guid%-prod
       name: PROD_NAMESPACE
       type: string
   tasks:
@@ -248,21 +259,21 @@ Let' create some storage for our `Workspace` that we will call `app-source`:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-oc create -f https://raw.githubusercontent.com/rhtr2020_pipelines/master/workshop/content/tekton/pvc/workspace-pvc.yaml -n pipeline-%guid%
+oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/pvc/workspace-pvc.yaml -n pipeline-%guid%
 ----
 
 After that, we can create our Pipeline inside pipeline-%guid% project. We can do either from Web Console pasting the above YAML content, left-side menu *Add+* -> *YAML* , or directly from CLI here:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-cat <<'EOF' | oc apply -f -
+cat <<'EOF' | oc apply -n pipeline-%guid% -f -
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: petclinic-pipeline
 spec:
   params:
-    - default: spring-petclinic
+    - default: petclinic
       description: The application deployment name
       name: APP_NAME
       type: string
@@ -275,14 +286,14 @@ spec:
       description: The application git repository revision
       name: APP_GIT_REVISION
       type: string
-    - default: 'spring-petclinic:latest'
+    - default: 'petclinic:latest'
       description: The application image stream
       name: APP_IMAGE_STREAM
       type: string
     - default: petclinic-%guid%-dev
       name: DEV_NAMESPACE
       type: string
-    - default: petclinic-%guid-prod
+    - default: petclinic-%guid%-prod
       name: PROD_NAMESPACE
       type: string
   tasks:
@@ -378,7 +389,7 @@ spec:
 EOF
 ----
 
-You can now review it also from Web Console, toggle *Developer Perspective*, select your project pipeline-%guid%, go to left-side menu, click *Pipelines* and you should see a new one named *spring-petclinic*.
+You can now review it also from Web Console, toggle *Developer Perspective*, select your project *pipeline-%guid%*, go to left-side menu, click *Pipelines* and you should see a new one named *petclinic-pipeline*.
 
 image::images/pipeline_overview.png[Pipeline Overview]
 
@@ -386,7 +397,7 @@ Verify it also from command line:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-oc get Pipeline -n *pipeline-%guid%
+oc get Pipeline -n pipeline-%guid%
 ----
 
 === tkn: Tekton CLI 
@@ -402,7 +413,7 @@ Check our pipeline:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-tkn pipeline list -n pipeline-%guid%
+tkn pipeline ls -n pipeline-%guid%
 ----
 
 

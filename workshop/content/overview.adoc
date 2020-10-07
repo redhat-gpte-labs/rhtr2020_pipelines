@@ -26,16 +26,16 @@ See https://tekton.dev and https://github.com/tektoncd/pipeline for more informa
 
 In this lab, you will convert an existing Jenkins pipeline into an OpenShift pipeline based on Tekton.
 
-In order to provide a real use case to work with, Pipelines are using a private repository (Gitea), hosting a Spring boot app (petclinic).
+In order to provide a real use case to work with, Pipelines are using a private repository (Gitea), hosting a Spring boot app (link:https://github.com/spring-projects/spring-petclinic[petclinic]). Pipelines also push and promote images across different projects representing _dev_ and _prod_ environments.
 
 Your lab environment has the following software already installed and running:
 
-* Gitea: An open source source code repository pre-loaded with the source code for the application
+* *Gitea*: An open source source code repository pre-loaded with the source code for the application
 ** Gitea has been configured for you with a clone of the repository to use when moving the pipeline to OpenShift Pipelines
-* Jenkins
-** A Jenkins Pipeline
+* *Jenkins*
+** A Jenkins Pipeline using Maven agent
 ** A developer and production project for the Jenkins Pipeline to use
-* OpenShift Pipelines Operator installed
+* *OpenShift Pipelines* Operator installed
 
 By completing this lab you will achieve the following goals:
 
