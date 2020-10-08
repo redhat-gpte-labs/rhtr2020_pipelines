@@ -71,7 +71,7 @@ Let's ensure we are in our *pipeline-%guid%* project:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-oc project *pipeline-%guid%
+oc project pipeline-%guid%
 ----
 
 We will assign the `edit` role for that in *petclinic-%guid%-dev*:
@@ -205,4 +205,3 @@ petclinic   petclinic-petclinic-nvin-%guid%.apps.cluster-wkrhtr.red.osp.opentlc.
                 None
 ----
 . Then check that application as well.
-

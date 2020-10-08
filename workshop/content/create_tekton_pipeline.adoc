@@ -104,8 +104,7 @@ promote-to-prod                10s
 s2i-java-11-binary-namespace   10s
 ----
 
-Let's explore them, you can do this either from link:
-%web_console_url%[Web Console] than command line:
+Let's explore them, you can do this either from the link:%web_console_url%[Web Console] or the command line:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
