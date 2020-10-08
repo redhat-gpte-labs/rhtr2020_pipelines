@@ -2,7 +2,7 @@ FROM quay.io/openshifthomeroom/workshop-dashboard:5.0.0
 
 ENV OCP_CLIENT_RELEASE=4.5.13
 ENV TKN_RELEASE=0.9.0
-ENV ODO_RELEASE=1.2.6
+ENV ODO_RELEASE=2.0.0
 ENV HELM_RELEASE=3.2.3
 
 USER root
@@ -35,6 +35,11 @@ RUN wget -O /tmp/tkn.tar.gz https://mirror.openshift.com/pub/openshift-v4/client
 # Install Helm
 RUN wget -O /opt/app-root/bin/helm https://mirror.openshift.com/pub/openshift-v4/clients/helm/${HELM_RELEASE}/helm-linux-amd64 && \
     chmod 775 /opt/app-root/bin/helm
+
+# Set up Bash Completion for OC and TKN
+RUN /opt/workshop/bin/oc completion bash >/etc/bash_completion.d/oc && \
+    /opt/app-root/bin/helm completion bash >/etc/bash_completion.d/helm && \
+    /opt/app-root/bin/tkn completion bash >/etc/bash_completion.d/tkn
 
 USER 1001
 
