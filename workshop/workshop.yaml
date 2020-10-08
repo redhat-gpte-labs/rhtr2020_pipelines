@@ -1,5 +1,5 @@
 ---
-name: RHTR 2020 Pipelines
+name: RHTR 2020 - From Jenkins to Tekton
 modules:
   activate:
   - overview

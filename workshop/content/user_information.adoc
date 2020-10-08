@@ -1,9 +1,12 @@
 :markup-in-source: verbatim,attributes,quotes
 
-== User Information
+// Title comes from the workshop.yaml
+// == User Information
 
 Feel free to resize the panes in this window to make more room for the lab instructions.
+
 '''
+
 Here is some important information about your environment:
 
 * Your GUID is: *%guid%*

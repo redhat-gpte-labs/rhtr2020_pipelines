@@ -1,7 +1,7 @@
 ---
 modules:
   overview:
-    name: Workshop Overview
+    name: Lab Overview
     exit_sign: Information about your environment
   user_information:
     name: Information about your environment
@@ -16,8 +16,8 @@ modules:
     name: Test OpenShift pipeline tasks
     exit_sign: Run OpenShift pipeline
   run_tekton_pipeline:
-    name: Run OpenShift Pipeline
+    name: Run OpenShift pipeline
     exit_sign: Add Webhook
   add_webhook:
     name: Add Webhook
-    exit_sign: Finish Workshop
+    exit_sign: Finish Lab

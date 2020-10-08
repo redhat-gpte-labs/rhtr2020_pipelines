@@ -1,6 +1,7 @@
 :markup-in-source: verbatim,attributes,quotes
 
-== Run the Jenkins Pipeline
+// Title comes from the workshop.yaml
+// == Run the Jenkins Pipeline
 
 In this section of the lab you will examine the Jenkins Pipeline and - if you want to - execute the pipeline.
 

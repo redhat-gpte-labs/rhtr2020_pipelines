@@ -1,6 +1,7 @@
-:GUID: %guid%
-:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
+
+// Title comes from the workshop.yaml
+// == Adding Triggers to the Pipeline
 
 Most Git repository servers support the concept of web hooks -- calling to an
 external source via HTTP(S) when a change in the code repository happens.
@@ -10,12 +11,9 @@ hook at the OpenShift Pipelines resources, automated code/build/deploy pipelines
 
 While Jenkins Pipelines were defined as `BuildConfig` with their webhook URLs, Tekton Pipelines have their own mechanism for that called `Trigger`.
 
-== Adding Triggers to the Pipeline
-
 Tekton link:https://github.com/tektoncd/triggers[Triggers] enable us to configure Pipelines to respond to external events (Git push events, pull requests etc) such as Web Hooks.
 
 Adding triggering support requires the creation of a `TriggerTemplate`, `TriggerBinding`, and an `EventListener` in our project.
-
 
 image::images/devops-pipeline-triggers.png[Triggers]
 
@@ -35,35 +33,35 @@ metadata:
   name: petclinic
 spec:
   params:
-    - name: git-revision
-    - name: git-commit-message
-    - name: git-repo-url
-    - name: git-repo-name
-    - name: content-type
-    - name: pusher-name
+  - name: git-revision
+  - name: git-commit-message
+  - name: git-repo-url
+  - name: git-repo-name
+  - name: content-type
+  - name: pusher-name
   resourcetemplates:
-    - apiVersion: tekton.dev/v1beta1
-      kind: PipelineRun
-      metadata:
-        labels:
-          tekton.dev/pipeline: petclinic-pipeline
-        name: petclinic-deploy-$(uid)
-      spec:
-        params:
-          - name: APP_NAME
-            value: petclinic
-          - name: APP_GIT_URL
-            value: $(params.git-repo-url)
-          - name: APP_GIT_REVISION
-            value: $(params.git-revision)
-        pipelineRef:
-          name: petclinic-pipeline
-        workspaces:
-        - name: app-source
-          persistentVolumeClaim:
-            claimName: app-source-pvc
-        - name: maven-settings
-          emptyDir: {}
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      labels:
+        tekton.dev/pipeline: petclinic-pipeline
+      name: petclinic-deploy-$(uid)
+    spec:
+      params:
+      - name: APP_NAME
+        value: petclinic
+      - name: APP_GIT_URL
+        value: $(params.git-repo-url)
+      - name: APP_GIT_REVISION
+        value: $(params.git-revision)
+      pipelineRef:
+        name: petclinic-pipeline
+      workspaces:
+      - name: app-source
+        persistentVolumeClaim:
+          claimName: app-source-pvc
+      - name: maven-settings
+        emptyDir: {}
 ----
 
 [source,yaml,role=copypaste]
@@ -140,7 +138,7 @@ Or get it from the CLI:
 oc get route el-petclinic -n pipeline-%guid%
 ----
 
-=== Configure Webhook in Gitea
+== Configure Webhook in Gitea
 
 Once you copied the Route URL for the `EventListener`, go to %gitea_url% and access with your credentials *%ocp_username%* and *%gitea_password%*.
 
@@ -156,7 +154,7 @@ Click on *Add Webhook*.
 
 image::images/gitea_webhook.png[Gitea Webhook]
 
-=== Trigger it!
+== Trigger it!
 
 Let's change something in the source code to start automatically our Pipeline.
 From project home in Gitea, navigate the code to `spring-petclinic / src / main / resources / messages /` and edit `message.properties`.
@@ -222,7 +220,6 @@ oc get routes -n petclinic-%guid%-prod
 You should see some beauty pets greetings here from RHTR :)
 
 image::images/webhook_successful.png[Webhook successful]
-
 
 == Summary
 
