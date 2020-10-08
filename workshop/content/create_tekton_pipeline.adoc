@@ -1,6 +1,5 @@
-:GUID: %guid%
-:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
+:search_tasks_url: %web_console_url%/search/ns/pipeline-%guid%?kind=tekton.dev~v1beta1~Task
 
 == OpenShift Pipeline
 
@@ -104,7 +103,7 @@ promote-to-prod                5s
 s2i-java-11-binary-namespace   7s
 ----
 
-Let's explore them, you can do this either from the link:%web_console_url%/search/ns/pipeline-%guid%?kind=tekton.dev~v1beta1~Task[Web Console] or the command line:
+Let's explore them, you can do this either from the link:{search_tasks_url}[Web Console] or the command line:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
