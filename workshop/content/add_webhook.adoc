@@ -219,11 +219,13 @@ oc get routes -n petclinic-%guid%-dev
 oc get routes -n petclinic-%guid%-prod
 ----
 
+You should see some beauty pets greetings here from RHTR :)
+
+image::images/webhook_successful.png[Webhook successful]
+
 
 == Summary
 
 Congratulations!
-
-image::images/webhook_successful.png[Webhook successful]
 
 You have converted a Pipeline from Jenkins to Tekton and learned what are the steps in order to do it. Now you are ready to spread the coolest Kubernetes CI/CD system with OpenShift and OpenShift Pipelines!
