@@ -27,6 +27,9 @@ spec:
     - default: petclinic-prod
       name: PROD_NAMESPACE
       type: string
+    - default: http://nexus.nexus.svc:8081/repository/maven-all-public/
+      name: MAVEN_MIRROR_URL
+      type: string
   tasks:
     - name: git-clone
       params:
@@ -47,6 +50,8 @@ spec:
         - name: GOALS
           value:
             - package
+        - name: MAVEN_MIRROR_URL
+          value: $(params.MAVEN_MIRROR_URL)
       runAfter:
         - git-clone
       taskRef:
