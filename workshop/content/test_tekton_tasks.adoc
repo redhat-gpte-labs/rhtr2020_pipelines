@@ -1,1 +1,229 @@
-=== TBD
+:GUID: %guid%
+:OCP_USERNAME: %ocp_username%
+:markup-in-source: verbatim,attributes,quotes
+
+== Test Tekton Tasks
+
+Before running our pipeline, we could try each single Task with a *TaskRun*, another Tekton object that let us running them as single entity.
+
+The TaskRun can be created from a YAML file, or with `tkn` CLI.
+
+=== Pipeline Service Account
+
+OpenShift Pipelines provides a service account `pipeline` available for each project. The service account is used to run pipelines and tasks, thus it need to have the right permission to access private repositories and private registries.
+
+==== Private Repository
+
+As Project admin, we can give the right permission to `pipeline` service account in order allow the `git-clone` ClusterTask accessing Gitea with our credentials.
+
+Let's create a Kubernetes `Secret` to attach to `pipeline`.
+
+First we create `git-secret` secret of type `kubernetes.io/basic-auth` with your git credentials:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc create secret generic git-secret --from-literal=username=%ocp_username% --from-literal=password=%gitea_password% --type "kubernetes.io/basic-auth" -n pipeline-%guid%
+----
+
+Then we annotate it with the URL of the git server we are using, this helps Tekton matching the permission for the specified git server:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc annotate secret git-secret "tekton.dev/git-0=https://gitea-gitea.apps.cluster-wkrhtr.red.osp.opentlc.com" -n pipeline-%guid%
+----
+
+Finally we attach that secret to `pipeline` service account that will be used by Tekton to execute our tasks, this will allow `git-clone` ClusterTask accessing our private repo on Gitea:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc secrets link pipeline git-secret -n pipeline-%guid%
+----
+
+Let's verify that the secret has been linked:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc describe sa pipeline -n pipeline-%guid%
+----
+
+You should see something like this:
+
+.Sample Output
+[source,options="nowrap",subs="{markup-in-source}"]
+----
+Name:                pipeline
+Namespace:           pipeline-%guid%
+Labels:              <none>
+Annotations:         <none>
+Image pull secrets:  pipeline-dockercfg-k4z7m
+Mountable secrets:   pipeline-token-qhq9h
+                     pipeline-dockercfg-k4z7m
+                     *git-secret*
+Tokens:              pipeline-token-h5jq6
+                     pipeline-token-qhq9h
+Events:              <none>
+----
+
+==== Private Registry
+
+Our Jenkins Pipeline was able to push built images to _dev_ and _prod_ projects because the `jenkins` service account was already setup with this permission. 
+Here we will do the same thing, allowing `pipeline` service account to push images to *petclinic-%guid%-dev* and *petclinic-%guid%-prod* projects.
+
+Let's ensure we are in our *pipeline-%guid%* project:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc project pipeline-%guid%
+----
+
+We will assign the `edit` role for that in *petclinic-%guid%-dev*:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc policy add-role-to-group edit system:serviceaccounts:pipeline-%guid% -n petclinic-%guid%-dev
+----
+
+Doing the same for *petclinic-%guid%-prod*:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc policy add-role-to-group edit system:serviceaccounts:pipeline-%guid% -n petclinic-%guid%-prod
+----
+
+=== Run the Tasks
+
+Let's try our first step of the Pipeline, the `git-clone` ClusterTask responsible of cloning our private repository.
+If you analyzed the ClusterTask from previous command, you noticed there is some workspace `output` needed, and some parameters to add:
+
+- *url*: URL of the git repo, use your link:%gitea_url%[Gitea URL]
+- *revision*: branch name, we use `main`
+- *deleteExisting*: removes a previous clone if present, `true` in our case
+
+Create a new *TaskRun* called `git-clone-taskrun`.
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+cat <<'EOF' | oc apply -n pipeline-%guid% -f -
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: git-clone-taskrun
+spec:
+  params:
+  - name: url
+    value: %gitea_url%
+  - name: revision
+    value: main
+  - name: deleteExisting
+    value: 'true'
+  taskRef:
+    kind: ClusterTask
+    name: git-clone
+  workspaces:
+    - name: output
+      persistentVolumeClaim:
+        claimName: app-source-pvc
+EOF
+----
+
+Follow along the log (wait few seconds for the log to come up):
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn taskrun logs -f git-clone-taskrun
+----
+
+You should see an output like this:
+
+.Sample Output
+[source,texinfo]
+----
+[clone] + CHECKOUT_DIR=/workspace/output/
+[clone] + '[[' true '==' true ]]
+[clone] + cleandir
+[clone] + '[[' -d /workspace/output/ ]]
+[clone] + rm -rf /workspace/output//docker-compose.yml /workspace/output//mvnw /workspace/output
+//mvnw.cmd /workspace/output//pom.xml /workspace/output//readme.md /workspace/output//src /works
+pace/output//target
+[clone] + rm -rf /workspace/output//.editorconfig /workspace/output//.git /workspace/output//.gi
+tignore /workspace/output//.mvn /workspace/output//.travis.yml /workspace/output//.vscode
+[clone] + rm -rf '/workspace/output//..?*'
+[clone] + test -z
+[clone] + test -z
+[clone] + test -z
+[clone] + /ko-app/git-init -url https://gitea-gitea.apps.cluster-wkrhtr.red.osp.opentlc.com/nvin
+to-redhat.com/spring-petclinic -revision main -refspec  -path /workspace/output/ '-sslVerify=true' '-submodules=true' -depth 1
+----
+
+Now let's try to implement the second step of our pipeline with another Task responsible to build the Spring boot app using Maven. We will use `maven` ClusterTask for that with 2 parameters:
+
+- *GOALS*: the maven goal, in this case `package` as we want to test and build the app
+- *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as Mirror for the app dependencies, we are going to use the link:http://nexus.nexus.svc:8081/repository/maven-all-public/[Nexus Service] for that.
+
+Create a *TaskRun* called `maven-taskrun`:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+cat <<'EOF' | oc apply -n pipeline-%guid% -f -
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: maven-taskrun
+spec:
+  params:
+    - name: GOALS
+      value:
+        - package
+    - name: MAVEN_MIRROR_URL
+      value: http://nexus.nexus.svc:8081/repository/maven-all-public/
+  taskRef:
+    kind: ClusterTask
+    name: maven
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: app-source-pvc
+    - name: maven-settings
+      emptyDir: {}
+EOF
+----
+
+Follow along the log (wait few seconds for the log to come up):
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn taskrun logs -f maven-taskrun
+----
+
+You should see an output like this:
+
+.Sample Output
+[source,texinfo]
+----
+...
+[mvn-goals] Downloading from spring-snapshots: https://repo.spring.io/snapshot/org/codehaus/gmaven/runtime/gmaven-r
+untime-support/1.3/gmaven-runtime-support-1.3.pom
+[mvn-goals] Downloading from spring-milestones: https://repo.spring.io/milestone/org/codehaus/gmaven/runtime/gmaven
+-runtime-support/1.3/gmaven-runtime-support-1.3.pom
+[mvn-goals] Downloading from mirror.default: http://nexus.nexus.svc:8081/repository/maven-all-public/org/codehaus/g
+maven/runtime/gmaven-runtime-support/1.3/gmaven-runtime-support-1.3.pom
+Downloaded from mirror.default: http://nexus.nexus.svc:8081/repository/maven-all-public/org/codehaus/gmaven/runtime
+/gmaven-runtime-support/1.3/gmaven-runtime-support-1.3.pom (2.3 kB at 78 kB/s)
+[mvn-goals] Downloading from spring-snapshots: https://repo.spring.io/snapshot/org/codehaus/gmaven/runtime/gmaven-r
+untime-api/1.3/gmaven-runtime-api-1.3.pom
+[mvn-goals] Downloading from spring-milestones: https://repo.spring.io/milestone/org/codehaus/gmaven/runtime/gmaven
+-runtime-api/1.3/gmaven-runtime-api-1.3.pom
+...
+----
+
+If also this step is completed with success, then our app is built and ready to be packaged into a container and pushed to OpenShift.
+
+In general, if we want to implement each step as a single Task, what we need to do is:
+
+- Create a TaskRun
+- Add all required parameters
+- Ensure the Workspace is present (if required)
+
+NOTE: A TaskRun can be created also with `tkn` CLI
+
+At this point we can decide to try to put everything in place directly inside a `Pipeline` object. Pipelines contains a list of Task and ClusterTask, and all pipeline parameters are passed to such objects in the form of `$(params.PARAM_NAME)`.
