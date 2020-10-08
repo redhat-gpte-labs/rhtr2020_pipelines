@@ -6,5 +6,6 @@ modules:
   - user_information
   - run_jenkins_pipeline
   - create_tekton_pipeline
+  - test_tekton_tasks
   - run_tekton_pipeline
   - add_webhook

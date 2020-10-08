@@ -11,6 +11,9 @@ modules:
     exit_sign: Create OpenShift pipeline
   create_tekton_pipeline:
     name: Create OpenShift pipeline
+    exit_sign: Test OpenShift pipeline tasks
+  test_tekton_tasks:
+    name: Test OpenShift pipeline tasks
     exit_sign: Run OpenShift pipeline
   run_tekton_pipeline:
     name: Run OpenShift Pipeline
