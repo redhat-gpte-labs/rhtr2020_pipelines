@@ -120,9 +120,9 @@ spec:
     kind: ClusterTask
     name: git-clone
   workspaces:
-    - name: output
-      persistentVolumeClaim:
-        claimName: app-source-pvc
+  - name: output
+    persistentVolumeClaim:
+      claimName: app-source-pvc
 EOF
 ----
 
@@ -158,7 +158,7 @@ to-redhat.com/spring-petclinic -revision main -refspec  -path /workspace/output/
 Now let's try to implement the second step of our pipeline with another Task responsible to build the Spring boot app using Maven. We will use `maven` ClusterTask for that with 2 parameters:
 
 - *GOALS*: the maven goal, in this case `package` as we want to test and build the app
-- *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as Mirror for the app dependencies, we are going to use the link:http://nexus.nexus.svc:8081/repository/maven-all-public/[Nexus Service] for that.
+- *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as Mirror for the app dependencies, we are going to use a Nexus Maven Mirror that is already installed on the cluster. The service URL for the Nexus Maven mirror is `http://nexus.nexus.svc:8081/repository/maven-all-public` for that. Note that because this is the OpenShift service this URL is not accessible from outside the OpenShift cluster.
 
 Create a *TaskRun* called `maven-taskrun`:
 
@@ -171,20 +171,22 @@ metadata:
   name: maven-taskrun
 spec:
   params:
-    - name: GOALS
-      value:
-        - package
-    - name: MAVEN_MIRROR_URL
-      value: http://nexus.nexus.svc:8081/repository/maven-all-public/
+  - name: GOALS
+    value:
+    - -DskipTests
+    - clean
+    - package
+  - name: MAVEN_MIRROR_URL
+    value: http://nexus.nexus.svc:8081/repository/maven-all-public/
   taskRef:
     kind: ClusterTask
     name: maven
   workspaces:
-    - name: source
-      persistentVolumeClaim:
-        claimName: app-source-pvc
-    - name: maven-settings
-      emptyDir: {}
+  - name: source
+    persistentVolumeClaim:
+      claimName: app-source-pvc
+  - name: maven-settings
+    emptyDir: {}
 EOF
 ----
 
