@@ -10,15 +10,21 @@ Here is some important information about your environment:
 * Your OpenShift and Gitea username is: *%ocp_username%* (which is your OpenTLC user ID)
 * Your OpenShift password is your OpenTLC Password
 * Your Gitea password is %gitea_password%
+
 '''
+
 * To log into OpenShift use the following command: *%login_command%*
 * OpenShift Web Console URL: *%web_console_url%*
+
 '''
+
 * Jenkins: %jenkins_url%
 * Gitea: %gitea_url%
 // * Nexus: %nexus_url%
 // * ArgoCD: %argocd_url%
+
 '''
+
 * The following projects have been created for you (you do not have permission to create your own projects):
 ** *bookbag-%guid%*: The project that runs the lab instructions and terminal for you to use during the lab
 ** *jenkins-%guid%*: Jenkins Project with a running Jenkins and an OpenShift build configuration of type `JenkinsPipeline` that holds the Jenkins Pipeline that you will translate into an OpenShift pipeline
