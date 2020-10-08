@@ -1,10 +1,11 @@
 :markup-in-source: verbatim,attributes,quotes
 
-== Overview
+// Title comes from the workshop.yaml
+// == Overview
 
-*Welcome to Red Hat Tech Ready 2020 and the Pipelines - from Jenkins to OpenShift Pipelines lab!*
+*Welcome to Red Hat Tech Ready 2020 and the Lab "From Jenkins to OpenShift Pipelines (Tekton)"!*
 
-link:https://www.jenkins.io/[Jenkins] has been the de-facto standard for CI/CD for multiple years now. In recent additions Jenkins gained the capability to build pipelines, first in Groovy, then in declarative syntax.
+link:https://www.jenkins.io[Jenkins] has been the de-facto standard for CI/CD for multiple years now. In recent additions Jenkins gained the capability to build pipelines, first in Groovy, then in declarative syntax.
 
 Despite the fact that Jenkins has been quite successful in the marketplace it does not really offer a Kubernetes native experience to write and deploy applications on Kubernetes platforms (including Red Hat OpenShift). While there are a few additions to Jenkins - like builder agent pods - Jenkins is still a rather heavy application that needs to be managed and cared for.
 

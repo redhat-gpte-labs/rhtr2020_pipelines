@@ -1,18 +1,17 @@
-:GUID: %guid%
-:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
 
-== Test Tekton Tasks
+// Title comes from the workshop.yaml
+// == Test Tekton Tasks
 
 Before running our pipeline, we could try each single Task with a *TaskRun*, another Tekton object that let us running them as single entity.
 
 The TaskRun can be created from a YAML file, or with `tkn` CLI.
 
-=== Pipeline Service Account
+== Pipeline Service Account
 
 OpenShift Pipelines provides a service account `pipeline` available for each project. The service account is used to run pipelines and tasks, thus it need to have the right permission to access private repositories and private registries.
 
-==== Private Repository
+=== Private Repository
 
 As Project admin, we can give the right permission to `pipeline` service account in order allow the `git-clone` ClusterTask accessing Gitea with our credentials.
 
@@ -64,7 +63,7 @@ Tokens:              pipeline-token-h5jq6
 Events:              <none>
 ----
 
-==== Private Registry
+=== Private Registry
 
 Our Jenkins Pipeline was able to push built images to _dev_ and _prod_ projects because the `jenkins` service account was already setup with this permission. 
 Here we will do the same thing, allowing `pipeline` service account to push images to *petclinic-%guid%-dev* and *petclinic-%guid%-prod* projects.
@@ -90,7 +89,7 @@ Doing the same for *petclinic-%guid%-prod*:
 oc policy add-role-to-group edit system:serviceaccounts:pipeline-%guid% -n petclinic-%guid%-prod
 ----
 
-=== Run the Tasks
+== Run the Tasks
 
 Let's try our first step of the Pipeline, the `git-clone` ClusterTask responsible of cloning our private repository.
 If you analyzed the ClusterTask from previous command, you noticed there is some workspace `output` needed, and some parameters to add:
@@ -120,9 +119,9 @@ spec:
     kind: ClusterTask
     name: git-clone
   workspaces:
-    - name: output
-      persistentVolumeClaim:
-        claimName: app-source-pvc
+  - name: output
+    persistentVolumeClaim:
+      claimName: app-source-pvc
 EOF
 ----
 
@@ -158,7 +157,7 @@ to-redhat.com/spring-petclinic -revision main -refspec  -path /workspace/output/
 Now let's try to implement the second step of our pipeline with another Task responsible to build the Spring boot app using Maven. We will use `maven` ClusterTask for that with 2 parameters:
 
 - *GOALS*: the maven goal, in this case `package` as we want to test and build the app
-- *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as Mirror for the app dependencies, we are going to use the link:http://nexus.nexus.svc:8081/repository/maven-all-public/[Nexus Service] for that.
+- *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as Mirror for the app dependencies, we are going to use a Nexus Maven Mirror that is already installed on the cluster. The service URL for the Nexus Maven mirror is `http://nexus.nexus.svc:8081/repository/maven-all-public` for that. Note that because this is the OpenShift service this URL is not accessible from outside the OpenShift cluster.
 
 Create a *TaskRun* called `maven-taskrun`:
 
@@ -171,20 +170,22 @@ metadata:
   name: maven-taskrun
 spec:
   params:
-    - name: GOALS
-      value:
-        - package
-    - name: MAVEN_MIRROR_URL
-      value: http://nexus.nexus.svc:8081/repository/maven-all-public/
+  - name: GOALS
+    value:
+    - -DskipTests
+    - clean
+    - package
+  - name: MAVEN_MIRROR_URL
+    value: http://nexus.nexus.svc:8081/repository/maven-all-public/
   taskRef:
     kind: ClusterTask
     name: maven
   workspaces:
-    - name: source
-      persistentVolumeClaim:
-        claimName: app-source-pvc
-    - name: maven-settings
-      emptyDir: {}
+  - name: source
+    persistentVolumeClaim:
+      claimName: app-source-pvc
+  - name: maven-settings
+    emptyDir: {}
 EOF
 ----
 

@@ -1,12 +1,11 @@
-:GUID: %guid%
-:OCP_USERNAME: %ocp_username%
 :markup-in-source: verbatim,attributes,quotes
 
-== Run the OpenShift Pipeline
+// Title comes from the workshop.yaml
+// == Run the OpenShift Pipeline
 
 We created and verified our tasks and we had setup our Pipeline, so now we are ready to start it.
 
-=== Run the Pipeline
+== Run the Pipeline
 
 We can start now our converted Pipeline either from Web Console, than from command line. For both methods, we're going to provide parameters to it.
 
@@ -17,7 +16,7 @@ We can start now our converted Pipeline either from Web Console, than from comma
 - *DEV_NAMESPACE*: name of target project representing the Dev environment for the app
 - *PROD_NAMESPACE*: name of target project representing the Prod environment for the app, where to promote it.
 
-==== Run with Web Console
+=== Run with Web Console
 
 From Developer Perspective again open `petclinic-pipeline` Pipeline and click on top-right *Actions* drop down list. Then click on *Start*.
 
@@ -27,7 +26,6 @@ Inside *Workspaces* section, select from *app-source* drop down list *PVC*, then
 Leave *maven-settings* to *Empty Directory*, since we don't have any custom setting for Maven here.
 
 Finally click on *Start* to run the Pipeline.
-
 
 image::images/pipeline_start.png[Start Pipeline]
 
@@ -42,7 +40,7 @@ Follow logs with `tkn`:
 tkn pipeline logs
 ----
 
-==== Run with tkn CLI
+=== Run with tkn CLI
 
 You can run the Pipeline directly and watch logs also with `tkn` CLI:
 
@@ -56,7 +54,7 @@ tkn pipeline start petclinic-pipeline  \
     -n pipeline-%guid%
 ----
 
-=== Access the Application
+== Access the Application
 
 image::images/pipeline_successful.png[Pipeline Successful]
 
