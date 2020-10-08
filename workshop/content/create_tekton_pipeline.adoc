@@ -124,9 +124,87 @@ oc get ClusterTasks git-clone -o yaml
 oc get ClusterTasks maven -o yaml
 ----
 
-Now we have all the components that we can connect to create our Tekton Pipeline, and this can be done through a `Pipeline` object.
+Tekton *Workspaces* allow you to specify one or more volumes that each Task in a Pipeline requires during execution. In our case, we need it persistency between Tasks which are executed in different containers, so let's create some storage for our `Workspace` that we will call `app-source`:
 
-Let's review our Pipeline YAML content:
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/pvc/workspace-pvc.yaml -n pipeline-%guid%
+----
+
+
+Now we have all the components that we can connect to create our Tekton Pipeline. Before doing that, we could try each single Task with a *TaskRun*, another Tekton object that let us running them as single entity.
+
+Let's try our first step of the Pipeline, the `git-clone` ClusterTask responsible of cloning our private repository.
+If you analyzed the ClusterTask from previous command, you noticed there are some parameters to add, and some workspace `output` needed.
+
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+cat <<'EOF' | oc apply -n pipeline-%guid% -f -
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: git-clone-taskrun
+spec:
+  params:
+  - name: url
+    value: %gitea_url%
+  - name: revision
+    value: main
+  - name: deleteExisting
+    value: 'true'
+  taskRef:
+    kind: ClusterTask
+    name: git-clone
+  workspaces:
+    - name: output
+      persistentVolumeClaim:
+        claimName: app-source-pvc
+EOF
+----
+
+This will create a new *TaskRun* called `git-clone-taskrun`.
+
+Follow along the log:
+
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn taskrun logs -f git-clone-taskrun
+----
+
+You should see an output like this:
+
+.Sample Output
+[source,texinfo]
+----
+[clone] + CHECKOUT_DIR=/workspace/output/
+[clone] + '[[' true '==' true ]]
+[clone] + cleandir
+[clone] + '[[' -d /workspace/output/ ]]
+[clone] + rm -rf /workspace/output//docker-compose.yml /workspace/output//mvnw /workspace/output
+//mvnw.cmd /workspace/output//pom.xml /workspace/output//readme.md /workspace/output//src /works
+pace/output//target
+[clone] + rm -rf /workspace/output//.editorconfig /workspace/output//.git /workspace/output//.gi
+tignore /workspace/output//.mvn /workspace/output//.travis.yml /workspace/output//.vscode
+[clone] + rm -rf '/workspace/output//..?*'
+[clone] + test -z
+[clone] + test -z
+[clone] + test -z
+[clone] + /ko-app/git-init -url https://gitea-gitea.apps.cluster-wkrhtr.red.osp.opentlc.com/nvin
+to-redhat.com/spring-petclinic -revision main -refspec  -path /workspace/output/ '-sslVerify=true' '-submodules=true' -depth 1
+----
+
+If our first step is completed with success, we can try out the other ones in the same way:
+
+- Create a TaskRun
+- Add all required parameters
+- Ensure the Workspace is present
+
+NOTE: A Task and a ClusterTask can be run also with `tkn` CLI
+
+At this point we can decide to try to put everything in place directly inside a `Pipeline` object. Pipelines contains a list of Task and ClusterTask, and all pipeline parameters are passed to such objects in the form of `$(params.PARAM_NAME)`.
+
+Let's review how our Pipeline YAML content would look like:
 
 [source,yaml,subs="{markup-in-source}",role=copypaste]
 ----
@@ -255,12 +333,6 @@ If you observe the code, Tekton Pipelines accepts some parameters like Jenkins P
 
 NOTE: One big difference between Jenkins and Tekton pipelines is the agent/executor. While in Jenkins it's just one pod, scheduled by the Kubernetes Plugin, executing all the steps, with Tekton, being a native extension of Kubernetes, there are many pods involved in the setup/execution. Each step, within the same Pipeline, it's executed by a different pod. That's why we need a shared volume to let the `git-clone` Task to communicate with the `maven` Task and the others. Proper the workspaces.
 
-Let' create some storage for our `Workspace` that we will call `app-source`:
-
-[source,bash,subs="{markup-in-source}",role=execute]
-----
-oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/pvc/workspace-pvc.yaml -n pipeline-%guid%
-----
 
 After that, we can create our Pipeline inside pipeline-%guid% project. We can do either from Web Console pasting the above YAML content, left-side menu *Add+* -> *YAML* , or directly from CLI here:
 
