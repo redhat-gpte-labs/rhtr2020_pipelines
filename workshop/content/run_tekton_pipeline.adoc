@@ -121,3 +121,5 @@ petclinic   petclinic-petclinic-nvin-%guid%.apps.cluster-wkrhtr.red.osp.opentlc.
                 None
 ----
 . Then check that application as well.
+
+image::images/pipeline_app_deployed.png[App deployed]
