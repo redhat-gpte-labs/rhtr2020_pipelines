@@ -9,21 +9,21 @@ OpenShift provides an API endpoint that supports receiving hooks from
 remote systems in order to trigger builds. By pointing the code repository's
 hook at the OpenShift Pipelines resources, automated code/build/deploy pipelines can be achieved.
 
-While Jenkins Pipelines were defined as `BuildConfig` with their webhook URLs, Tekton Pipelines have their own mechanism for that called `Trigger`.
+While Jenkins Pipelines were defined as *BuildConfig* with their webhook URLs, Tekton Pipelines have their own mechanism for that called *Trigger*.
 
 Tekton link:https://github.com/tektoncd/triggers[Triggers] enable us to configure Pipelines to respond to external events (Git push events, pull requests etc) such as Web Hooks.
 
-Adding triggering support requires the creation of a `TriggerTemplate`, `TriggerBinding`, and an `EventListener` in our project.
+Adding triggering support requires the creation of a *TriggerTemplate*, *TriggerBinding*, and an *EventListener* in our project.
 
 image::images/devops-pipeline-triggers.png[Triggers]
 
-Let's see each component in detail:
+Examine see each component in detail:
 
-* *TriggerTemplate*: a trigger template is a template for newly created resources. It supports parameters to create specific `PipelineResources` and `PipelineRuns`.
+* *TriggerTemplate*: a trigger template is a template for newly created resources. It supports parameters to create specific *PipelineResources* and *PipelineRuns*.
 * *TriggerBinding*: validates events and extracts payload fields
-* *EventListener*: connects `TriggerBindings` and `TriggerTemplates` into an addressable endpoint (the event sink). It uses the extracted event parameters from each TriggerBinding (and any supplied static parameters) to create the resources specified in the corresponding TriggerTemplate. It also optionally allows an external service to pre-process the event payload via the interceptor field.
+* *EventListener*: connects *TriggerBindings* and *TriggerTemplates* into an addressable endpoint (the event sink). It uses the extracted event parameters from each TriggerBinding (and any supplied static parameters) to create the resources specified in the corresponding TriggerTemplate. It also optionally allows an external service to pre-process the event payload via the interceptor field.
 
-Let's review our component that we can create either from Web Console than command line:
+Review our component that we can create either from Web Console than command line:
 
 [source,yaml,role=copypaste]
 ----
@@ -114,24 +114,24 @@ spec:
     weight: 100
 ----
 
-Let's create them all:
+Create all these objects using a provided YAML manifest:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
 oc create -f https://raw.githubusercontent.com/redhat-gpte-labs/rhtr2020_pipelines/master/workshop/content/tekton/triggers/petclinic-triggers.yaml -n pipeline-%guid%
 ----
 
-You should see now a new Deployment for the *EventListener* `el-petclinic` has been created:
+You should see that a new Deployment for the *EventListener* `el-petclinic` has been created:
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
 oc get deployment -n pipeline-%guid%
 ----
 
-Also from Web Console, you should see a new Deployment `el-petclinic`. From there, copy `el-petclinic` Route we will use to configure a Webhook inside Gitea.
+Also from Web Console, you should see a new Deployment `el-petclinic`. From there, copy `el-petclinic` route that you will use to configure a Webhook in Gitea.
 
 image::images/pipeline_eventlistener.png[Eventlistener]
 
-Or get it from the CLI:
+You can also retrieve the route from the CLI:
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
@@ -142,10 +142,12 @@ oc get route el-petclinic -n pipeline-%guid%
 
 Once you copied the Route URL for the `EventListener`, go to %gitea_url% and access with your credentials *%ocp_username%* and *%gitea_password%*.
 
-After you logged in successfully, navigate to Gitea tabs and select from top right *Settings*, then select *Webhooks* tab. Then from top-right click on *Add Webhook* and select *Gitea* type.
+After you logged in successfully, navigate to the `spring-petclinic` repository. Then at the top right click on *Settings*, then click the *Webhooks* tab.
+
+Click the blue *Add Webhook* button and select the *Gitea* webhook type.
 
 Add:
-- *Target URL*: the URL you copied from previous Route
+- *Target URL*: the URL you copied from previously retrieved route to your event listener (make sure to use `http://` at the beginning of the URL)
 - *HTTP Method*: POST
 - *POST Content Type*: application/json
 - *Secret*: leave it blank
@@ -156,17 +158,17 @@ image::images/gitea_webhook.png[Gitea Webhook]
 
 == Trigger it!
 
-Let's change something in the source code to start automatically our Pipeline.
-From project home in Gitea, navigate the code to `spring-petclinic / src / main / resources / messages /` and edit `message.properties`.
+Change a file in the source code to automatically trigger your Pipeline.
+From project home in Gitea, navigate to `spring-petclinic / src / main / resources / messages /` and edit `message.properties`.
 
-Let's change `Line 1` from:
+Change `Line 1` from:
 
 [source,text,subs="{markup-in-source}"]
 ----
 welcome=Welcome
 ----
 
-To:
+to:
 
 [source,text,subs="{markup-in-source}", role=copypaste]
 ----
@@ -175,7 +177,7 @@ welcome=Welcome to RHTR!
 
 Click *Commit Changes* to commit and push changes.
 
-Now the EventListener should have been invoked through the Route we setup inside Gitea Webhooks and thus a new pipeline should have started.
+Now the EventListener should have been invoked through the Route that you setup as a Gitea Webhook and thus a new pipeline should have started.
 
 You can verify it from CLI:
 
@@ -191,11 +193,11 @@ Get logs from the running pipeline, select latest one:
 tkn pipeline logs -n pipeline-%guid%
 ----
 
-Or from Web Console, from left-side menu click *Pipelines* and then *petclinic-pipeline* to see running *PipelineRuns*.
+Or in the Web Console, from left-side menu click *Pipelines* and then *petclinic-pipeline* to see running *PipelineRuns*.
 
 image::images/pipeline_successful.png[Pipeline successful]
 
-When the Pipeline has completed with success, verify the new changes from *pipeline-%guid%-dev* and *pipeline-%guid%-prod* projects, clicking on Routes showing your changes deployed.
+When the Pipeline has completed successfully, verify the new changes from *pipeline-%guid%-dev* and *pipeline-%guid%-prod* projects, clicking on Routes showing your changes deployed.
 
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
@@ -217,12 +219,12 @@ oc get routes -n petclinic-%guid%-dev
 oc get routes -n petclinic-%guid%-prod
 ----
 
-You should see some beauty pets greetings here from RHTR :)
+You should see some some beautiful pets greeting you from RHTR! :)
 
 image::images/webhook_successful.png[Webhook successful]
 
 == Summary
 
-Congratulations!
+You have successfully converted a Pipeline from Jenkins to Tekton and learned what steps are necessary to do so. And you even added an automatic pipeline trigger for any change to the source code repository.
 
-You have converted a Pipeline from Jenkins to Tekton and learned what are the steps in order to do it. Now you are ready to spread the coolest Kubernetes CI/CD system with OpenShift and OpenShift Pipelines!
+Congratulations! This completes this lab.
