@@ -123,7 +123,6 @@ oc get route -n petclinic-%guid%-prod
 [source,texinfo,options="nowrap"]
 ----
 NAME        HOST/PORT                                                                         PATH   SERVICES    PORT       TERMINATION   WILDCARD
-
 petclinic   petclinic-petclinic-%guid%-prod.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                 None
 ----
