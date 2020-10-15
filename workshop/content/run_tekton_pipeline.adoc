@@ -87,7 +87,7 @@ oc get route -n petclinic-%guid%-dev
 ----
 NAME        HOST/PORT                                                                    PATH   SERVICES    PORT
  TERMINATION   WILDCARD
-petclinic   petclinic-petclinic-nvin-dev.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+petclinic   petclinic-petclinic-%guid%-dev.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                None
 ----
 
@@ -119,7 +119,7 @@ oc get route -n petclinic-%guid%-prod
 ----
 NAME        HOST/PORT                                                                     PATH   SERVICES    PORT
   TERMINATION   WILDCARD
-petclinic   petclinic-petclinic-nvin-%guid%.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+petclinic   petclinic-petclinic-%guid%-prod.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                 None
 ----
 . Then check that application as well.
