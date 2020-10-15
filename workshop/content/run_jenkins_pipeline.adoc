@@ -75,11 +75,11 @@ oc get route -n petclinic-jenkins-%guid%-dev
 ----
 NAME        HOST/PORT                                                                    PATH   SERVICES    PORT
  TERMINATION   WILDCARD
-petclinic   petclinic-petclinic-jenkins-wk-dev.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+petclinic   petclinic-petclinic-jenkins-%guid%-dev.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                None
 ----
 
-. Use the route (`petclinic-petclinic-jenkins-wk-dev.apps.cluster-wkrhtr.red.osp.opentlc.com` in the example above) in a web browser to validate that the application is working.
+. Use the route (`petclinic-petclinic-jenkins-%guid%-dev.%CLUSTER_SUBDOMAIN%` in the example above) in a web browser to validate that the application is working.
 . Also check that the production application is working. First check that the pod is running in your production project (note that you will not see a build pod in this project - you only build the container image in the development project):
 +
 [source,bash,subs="{markup-in-source}",role=execute]
@@ -107,7 +107,7 @@ oc get route -n petclinic-jenkins-%guid%-prod
 ----
 NAME        HOST/PORT                                                                     PATH   SERVICES    PORT
   TERMINATION   WILDCARD
-petclinic   petclinic-petclinic-jenkins-wk-prod.apps.cluster-wkrhtr.red.osp.opentlc.com          petclinic   8080-tcp
+petclinic   petclinic-petclinic-jenkins-%guid%-prod.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                 None
 ----
 . Then check that application as well.

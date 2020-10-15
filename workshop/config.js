@@ -21,6 +21,7 @@ function initialize(workshop) {
         for (var varname in workshop_vars) {
             workshop.data_variable(varname, workshop_vars[varname]);
         }
+        workshop.data_variable('CLUSTER_SUBDOMAIN', process.env['CLUSTER_SUBDOMAIN']);
     } catch(err) {}
 }
 
