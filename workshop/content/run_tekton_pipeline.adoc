@@ -20,23 +20,24 @@ For both methods, you will need to provide input parameters:
 
 === Run in the Web Console
 
-From the Developer Perspective again open `petclinic-pipeline` Pipeline and click on top-right *Actions* drop down list. Then click on *Start*.
-
+. From the Developer Perspective again open `petclinic-pipeline` Pipeline and click on top-right *Actions* drop down list. Then click on *Start*.
++
 image::images/pipeline_action_start.png[Actions Start]
 
-Inside *Workspaces* section, select from *app-source* drop down list *PVC*, then select *app-source-pvc*.
-Leave *maven-settings* to *Empty Directory*, since we don't have any custom setting for Maven here.
+. Inside *Workspaces* section, select from *app-source* drop down list *PVC*, then select *app-source-pvc*.
++
+Leave the default of *Empty Directory* for *maven-settings* since you don't need to provide any custom Maven setting.
 
-Finally click the blue *Start* button to run the Pipeline.
-
+. Click the blue *Start* button to run the Pipeline.
++
 image::images/pipeline_start.png[Start Pipeline]
 
-Follow execution and logs by clicking on active or executed Tasks:
-
+. Follow execution and logs by clicking on active or executed Tasks:
++
 image::images/pipeline_run.png[Pipeline Running]
 
-You can also follow the logs with `tkn`:
-
+. You can also follow the logs from the terminal with `tkn`:
++
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
 tkn pipeline logs -f
@@ -56,12 +57,17 @@ tkn pipeline start petclinic-pipeline  \
     -n pipeline-%guid%
 ----
 
+[NOTE]
+In this example you just use the default parameters that the pipeline defined. You could of course specify your own parameters if required.
+
 == Access the Application
 
 image::images/pipeline_successful.png[Pipeline Successful]
 
 If the pipeline was successful, then an image has been pushed into the `pipeline-%guid%-dev` project and a new deployment has been performed. Then the image has been tagged for _prod_ and deployed to `pipeline-%guid%-prod`.
 
+. Validate that the application is running in the Development project:
++
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
 oc get pod -n petclinic-%guid%-dev
@@ -83,15 +89,14 @@ oc get route -n petclinic-%guid%-dev
 ----
 +
 .Sample Output
-[source,texinfo]
+[source,texinfo,options="nowrap"]
 ----
-NAME        HOST/PORT                                                                    PATH   SERVICES    PORT
- TERMINATION   WILDCARD
+NAME        HOST/PORT                                                                        PATH   SERVICES    PORT       TERMINATION   WILDCARD
 petclinic   petclinic-petclinic-%guid%-dev.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                None
 ----
 
-. Use the route (`petclinic-petclinic-%guid%-dev.apps.cluster-wkrhtr.red.osp.opentlc.com` in the example above) in a web browser to validate that the application is working.
+. Use the route (`petclinic-petclinic-%guid%-dev.%CLUSTER_SUBDOMAIN%` in the example above) in a web browser to validate that the application is working.
 . Also check that the production application is working. First check that the pod is running in your production project (note that you will not see a build pod in this project - you only build the container image in the development project):
 +
 [source,bash,subs="{markup-in-source}",role=execute]
@@ -115,13 +120,12 @@ oc get route -n petclinic-%guid%-prod
 ----
 +
 .Sample Output
-[source,texinfo]
+[source,texinfo,options="nowrap"]
 ----
-NAME        HOST/PORT                                                                     PATH   SERVICES    PORT
-  TERMINATION   WILDCARD
+NAME        HOST/PORT                                                                         PATH   SERVICES    PORT       TERMINATION   WILDCARD
 petclinic   petclinic-petclinic-%guid%-prod.%CLUSTER_SUBDOMAIN%          petclinic   8080-tcp
                 None
 ----
-. Then check that application as well.
+. Then check that the production application is also running.
 
 image::images/pipeline_app_deployed.png[App deployed]
