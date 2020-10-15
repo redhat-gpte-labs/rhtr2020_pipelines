@@ -112,4 +112,6 @@ petclinic   petclinic-petclinic-jenkins-%guid%-prod.%CLUSTER_SUBDOMAIN%         
 ----
 . Then check that application as well.
 
+image::images/pipeline_app_deployed.png[Petclinic deployed]
+
 Now that you have validated that everything is working as designed you are ready to convert the Jenkins pipeline into an OpenShift pipeline.
