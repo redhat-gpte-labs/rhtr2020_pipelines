@@ -210,7 +210,7 @@ tkn pipeline ls -n pipeline-%guid%
 +
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-tkn pipeline logs -n pipeline-%guid%
+tkn pipeline logs -f -n pipeline-%guid%
 ----
 
 . Alternatively in the Web Console, from left-side menu click *Pipelines* and then *petclinic-pipeline* to see running *PipelineRuns*.
