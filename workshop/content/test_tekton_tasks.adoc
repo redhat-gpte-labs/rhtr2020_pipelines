@@ -439,7 +439,6 @@ tkn task start promote-to-prod  \
     -p IMAGE_STREAM=petclinic:latest  \
     -p DEV_NAMESPACE=petclinic-%guid%-dev \
     -p PROD_NAMESPACE=petclinic-%guid%-prod \
-    -w name=app-source,claimName=app-source-pvc \
     --showlog \
     -n pipeline-%guid%
 ----
@@ -466,7 +465,6 @@ tkn task start deploy-to-project  \
     -p DEPLOYMENT=petclinic  \
     -p IMAGE_STREAM=petclinic:prod  \
     -p NAMESPACE=petclinic-%guid%-prod \
-    -w name=app-source,claimName=app-source-pvc \
     --showlog \
     -n pipeline-%guid%
 ----
