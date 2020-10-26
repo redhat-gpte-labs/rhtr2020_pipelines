@@ -131,7 +131,7 @@ EOF
 +
 Creating the *TaskRun* immediately starts the task run.
 +
-NOTE: In later versions of the Tekton CLI it will be possible to create a TaskRun using the CLI.
+NOTE: In later versions of the Tekton CLI it will be possible to create a TaskRun using the CLI also for ClusterTasks.
 
 . Using the `tkn` command follow the log (it may take a few seconds for log messages to appear):
 +
@@ -354,7 +354,6 @@ inic:latest
 [push] Storing signatures
 ----
 
-NOTE: The support for running also ClusterTasks with tkn cli is available in next versions.
 
 === Test deploy-to-dev Task
 
