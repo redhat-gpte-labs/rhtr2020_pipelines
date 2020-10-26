@@ -96,7 +96,7 @@ One of the nice features of OpenShift pipelines is that you can test each task i
 
 First you will execute the first step of the Pipeline, the `git-clone` ClusterTask responsible of cloning our private repository.
 
-If you analyzed the ClusterTask in the previous section, you noticed that thhere it requires three input parameters and a workspace as output:
+If you analyzed the ClusterTask in the previous section, you noticed that it requires three input parameters and a workspace as output:
 
 - *url*: URL of the git repo, use your Gitea ULR: %gitea_url%
 - *revision*: branch name, we use `main`
@@ -180,9 +180,9 @@ Now execute the second task of our pipeline which builds the Spring boot app usi
 - *MAVEN_MIRROR_URL*: the URL of an internal Nexus we can use as a Maven mirror for the app dependencies, we are going to use a Nexus Maven Mirror that is already installed on the cluster. The service URL for the Nexus Maven mirror is http://nexus.nexus.svc:8081/repository/maven-all-public. Note that because this is the URL of the OpenShift service this URL is not accessible from outside the OpenShift cluster (you really don't want to use the Route here - otherwise every request would create additional unneccessary network load).
 +
 [NOTE]
-You will still see that some Spring artifacts are being downloaded from the internet rather than from Nexus. This is because the internal service URL for Nexus is an insecure route (`http`) and the project settings in the source code repo (`pom.xml`) require a secure connection for Spring dependencies.
+You will still see that some Spring artifacts are being downloaded from the internet rather than from Nexus. This is because the internal service URL for Nexus is an insecure route (`http`) and the project settings in the source code repo (`pom.xml`) require a secure connection for Spring dependencies (`nohttp`).
 
-. Create a *TaskRun* called `maven-taskrun`:
+. Create a *TaskRun* called `maven-build-taskrun`:
 +
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
@@ -190,7 +190,7 @@ cat <<'EOF' | oc apply -n pipeline-%guid% -f -
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: maven-taskrun
+  name: maven-build-taskrun
 spec:
   params:
   - name: GOALS
@@ -216,7 +216,7 @@ EOF
 +
 [source,bash,subs="{markup-in-source}",role=execute]
 ----
-tkn taskrun logs -f maven-taskrun
+tkn taskrun logs -f maven-build-taskrun
 ----
 +
 .Sample Output
@@ -238,12 +238,278 @@ tkn taskrun logs -f maven-taskrun
 [mvn-goals] [INFO] ------------------------------------------------------------------------
 ----
 +
+Once this task run is completed successfully, your app is built and ready to tested.
+
+=== Test maven test Task
+
+. Create a *TaskRun* called `maven-test-taskrun`:
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+cat <<'EOF' | oc apply -n pipeline-%guid% -f -
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: maven-test-taskrun
+spec:
+  params:
+  - name: GOALS
+    value:
+    - test
+  - name: MAVEN_MIRROR_URL
+    value: http://nexus.nexus.svc:8081/repository/maven-all-public/
+  taskRef:
+    kind: ClusterTask
+    name: maven
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: app-source-pvc
+  - name: maven-settings
+    emptyDir: {}
+EOF
+----
+
+. Using the `tkn` command follow the log (it may take a few seconds for log messages to appear):
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn taskrun logs -f maven-test-taskrun
+----
++
+.Sample Output
+[source,texinfo]
+----
+...
+Source       : HikariPool-1 - Shutdown completed.
+[mvn-goals] 2020-10-26 12:31:57.664  INFO 212 --- [extShutdownHook] org.ehcache.core.EhcacheMana
+ger          : Cache 'vets' removed from EhcacheManager.
+[mvn-goals] [INFO]
+[mvn-goals] [INFO] Results:
+[mvn-goals] [INFO]
+[mvn-goals] [WARNING] Tests run: 40, Failures: 0, Errors: 0, Skipped: 1
+[mvn-goals] [INFO]
+[mvn-goals] [INFO] ------------------------------------------------------------------------
+[mvn-goals] [INFO] BUILD SUCCESS
+[mvn-goals] [INFO] ------------------------------------------------------------------------
+[mvn-goals] [INFO] Total time:  01:54 min
+[mvn-goals] [INFO] Finished at: 2020-10-26T12:31:58Z
+[mvn-goals] [INFO] ------------------------------------------------------------------------
+----
++
 Once this task run is completed successfully, your app is built and ready to be packaged into a container and pushed to OpenShift.
+
+=== Test build-image Task
+
+Once you app is built and tested, it's time to merge it inside a container, and this comes easy using the Source-to-Image (S2I) Task `s2i-java-11-binary-namespace` we created in previous chapter.
+
+NOTE: A Task definition is available by default only in the project where it has been created, while a ClusterTask it's available for all projects. 
+
+Let's look at required parameters for this Task:
+
+- *TLSVERIFY*: it verifies if the target registry has trusted certs, default to `false` 
+- *OUTPUT_IMAGE_STREAM*: the name of the ImageStream as representing the container image built in this step, format is `name`:`tag`
+- *NAMESPACE*: target project where to push the result container image
+
+At this step, we want to create a container image from latest successful build and push it to the Dev environment, ready to be deployed.
+
+. Use `tkn` cli to create automatically a TaskRun and start our Task:
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn task start s2i-java-11-binary-namespace  \
+    -p TLSVERIFY=false  \
+    -p OUTPUT_IMAGE_STREAM=petclinic:latest  \
+    -p NAMESPACE=petclinic-%guid%-dev \
+    -w name=source,claimName=app-source-pvc \
+    --showlog \
+    -n pipeline-%guid%
+----
++
+.Sample Output
+[source,texinfo]
+----
+...
+[build] test-classes/org/springframework/samples/petclinic/vet/
+[build] test-classes/org/springframework/samples/petclinic/vet/VetControllerTests.class
+[build] test-classes/org/springframework/samples/petclinic/vet/VetTests.class
+[build] --> 06dcb1ff43b
+[build] STEP 8: CMD /usr/local/s2i/run
+[build] STEP 9: COMMIT image-registry.openshift-image-registry.svc:5000/petclinic-nvin-dev/petcl
+inic:latest
+[build] --> 75d21fa3235
+[build] 75d21fa32350c916b7c9b48d0f1d4c50f471a0ef47f0decbf173cf04c0e0b670
+
+[push] Getting image source signatures
+[push] Copying blob sha256:d5409e07a0c879144c196c38ab9a7a3f59d8630882ad19d2d87e0aaa7af09c7f
+[push] Copying blob sha256:548d9305d034bf3372b997ad14f69bd608eea7112a6200daebf92ed91cb52dfc
+[push] Copying blob sha256:542fb4667c977c3105e17701368e9ce44f4cc331b9b34ec9aabd04d6f93761e8
+[push] Copying blob sha256:c13e1fc2ca26f7749d5a2913f891616b909915f1e900be49c24b17f2faaa6f04
+[push] Copying blob sha256:245644d3cbb3f32769c9667fe3159a0f56d4190d7f74dd3c7518b6c7f4c05050
+[push] Copying blob sha256:14324321c32b5060c4aa3d4c6dc03aa49db935df5bde16deb39ec7ef12b354a0
+[push] Copying config sha256:75d21fa32350c916b7c9b48d0f1d4c50f471a0ef47f0decbf173cf04c0e0b670
+[push] Writing manifest to image destination
+[push] Copying config sha256:75d21fa32350c916b7c9b48d0f1d4c50f471a0ef47f0decbf173cf04c0e0b670
+[push] Writing manifest to image destination
+[push] Storing signatures
+----
+
+NOTE: The support for running also ClusterTasks with tkn cli is available in next versions.
+
+=== Test deploy-to-dev Task
+
+Now that the container image is available in our petclinic-%guid%-dev project representing the Dev environment, we are ready to deploy it with the `deploy-to-project` Task we already created.
+
+Let's look at required parameters for this Task:
+
+- *DEPLOYMENT*: the name of the Deployment to use for our app 
+- *IMAGE_STREAM*: the name of the ImageStream as representing the container image pushed to the target project
+- *NAMESPACE*: target project where to deploy the container image
+
+Let's deploy our app to Dev project `petclinic-%guid%-dev`:
+
+. Use `tkn` cli to create automatically a TaskRun and start our Task:
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn task start deploy-to-project  \
+    -p DEPLOYMENT=petclinic  \
+    -p IMAGE_STREAM=petclinic:latest  \
+    -p NAMESPACE=petclinic-%guid%-dev \
+    --showlog \
+    -n pipeline-%guid%
+----
++
+NOTE: From this point of the pipeline, the workspace is not needed anymore, since the container image has been already stored in the Container Registry and we can manage it via ImageStreams and Deployments
++
+.Sample Output
+[source,texinfo]
+----
+[deploy] + image_ref=image-registry.openshift-image-registry.svc:5000/petclinic-nvin-dev/petclin
+ic:latest
+[deploy] + echo 'Deploying image-registry.openshift-image-registry.svc:5000/petclinic-nvin-dev/p
+etclinic:latest'
+[deploy] Deploying image-registry.openshift-image-registry.svc:5000/petclinic-nvin-dev/petclinic
+:latest
+[deploy] ++ oc get deployment petclinic -n petclinic-nvin-dev
+[deploy] + deployment='NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+[deploy] petclinic   1/1     1            1           12d'
+[deploy] + '[' 0 -ne 0 ']'
+[deploy] + oc set image deployment/petclinic petclinic=image-registry.openshift-image-registry.s
+vc:5000/petclinic-nvin-dev/petclinic:latest -n petclinic-nvin-dev
+[deploy] deployment.apps/petclinic image updated
+[deploy] ++ date +%s
+[deploy] + oc patch deployment petclinic -p '{"spec": {"template": {"metadata": { "labels": {  "
+redeploy": "1603715966"}}}}}' -n petclinic-nvin-dev
+[deploy] deployment.apps/petclinic patched
+[deploy] + oc rollout status deployment/petclinic -n petclinic-nvin-dev
+[deploy] Waiting for deployment spec update to be observed...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 1 old replicas are pending termin
+ation...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 1 old replicas are pending termin
+ation...
+[deploy] deployment "petclinic" successfully rolled out
+----
+
+=== Test promote-to-prod Task
+
+If we verified that our app is running fine for the Dev environment, we can decide to promote it to the Prod environment, represented by `petclinic-%guid%-prod` project.
+
+Let's look at required parameters for this Task:
+
+- *DEPLOYMENT*: the name of the Deployment to use for our app 
+- *IMAGE_STREAM*: the name of the ImageStream as representing the container image pushed to the target project
+- *DEV_NAMESPACE*: source project from where to promote the app the container image
+- *PROD_NAMESPACE*: target project to promote the app by tagging the container image (`oc tag`)
+
+Let's promote our app from Dev project `petclinic-%guid%-dev` to Prod project `petclinic-%guid%-prod` by tagging the ImageStream from `petclinic:latest` to `petclinic:prod`. This will be the image tag used for the Prod environment.  
+
+. Use `tkn` cli to create automatically a TaskRun and start our Task:
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn task start promote-to-prod  \
+    -p DEPLOYMENT=petclinic  \
+    -p IMAGE_STREAM=petclinic:latest  \
+    -p DEV_NAMESPACE=petclinic-%guid%-dev \
+    -p PROD_NAMESPACE=petclinic-%guid%-prod \
+    --showlog \
+    -n pipeline-%guid%
+----
++
+.Sample Output
+[source,texinfo]
+----
+[deploy] + oc tag petclinic-nvin-dev/petclinic:latest petclinic-nvin-dev/petclinic:prod
+[deploy] Tag petclinic-nvin-dev/petclinic:prod set to petclinic-nvin-dev/petclinic@sha256:67ad1c
+50ee57742ecae24d4aadfcf24a84c23a14f1ade6b921282ce289720080.
+----
+
+=== Test deploy-to-prod Task
+
+Finally we are ready for the last step, the deployment of the app for Production!
+
+We can reuse the same Task `deploy-to-project` as before, changing the parameters to deploy the app to `petclinic-%guid%-prod` project and to use `petclinc:prod` tag at this time:
+
+. Use `tkn` cli to create automatically a TaskRun and start our Task:
++
+[source,bash,subs="{markup-in-source}",role=execute]
+----
+tkn task start deploy-to-project  \
+    -p DEPLOYMENT=petclinic  \
+    -p IMAGE_STREAM=petclinic:prod  \
+    -p NAMESPACE=petclinic-%guid%-prod \
+    --showlog \
+    -n pipeline-%guid%
+----
++
+.Sample Output
+[source,texinfo]
+----
+[deploy] + image_ref=image-registry.openshift-image-registry.svc:5000/petclinic-nvin-prod/petcli
+nic:prod
+[deploy] + echo 'Deploying image-registry.openshift-image-registry.svc:5000/petclinic-nvin-prod/
+petclinic:prod'
+[deploy] Deploying image-registry.openshift-image-registry.svc:5000/petclinic-nvin-prod/petclini
+c:prod
+[deploy] ++ oc get deployment petclinic -n petclinic-nvin-prod
+[deploy] + deployment='NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+[deploy] petclinic   1/1     1            1           12d'
+[deploy] + '[' 0 -ne 0 ']'
+[deploy] + oc set image deployment/petclinic petclinic=image-registry.openshift-image-registry.s
+vc:5000/petclinic-nvin-prod/petclinic:prod -n petclinic-nvin-prod
+[deploy] deployment.apps/petclinic image updated
+[deploy] ++ date +%s
+[deploy] + oc patch deployment petclinic -p '{"spec": {"template": {"metadata": { "labels": {  "
+redeploy": "1603716255"}}}}}' -n petclinic-nvin-prod
+[deploy] deployment.apps/petclinic patched
+[deploy] + oc rollout status deployment/petclinic -n petclinic-nvin-prod
+[deploy] Waiting for deployment spec update to be observed...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 0 out of 1 new replicas have been
+ updated...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 1 old replicas are pending termin
+ation...
+[deploy] Waiting for deployment "petclinic" rollout to finish: 1 old replicas are pending termin
+ation...
+[deploy] deployment "petclinic" successfully rolled out
+----
+
+== Summary
 
 In general, if you want to test each task, what you need to do is:
 
-- Create a TaskRun
+- Create a TaskRun with YAML or tkn cli
 - Add all required input and output parameters
 - If required ensure the Workspace (PersistentVolumeClaim) is present
 
-At this point you are ready to use your `Pipeline`. Pipelines contains a list of Task and ClusterTask, and all pipeline parameters are passed to tasks in the form of `$(params.PARAM_NAME)`.
+At this point you are ready to pack all tasks and manage them into a single `Pipeline`. Pipelines contains a list of Task and ClusterTask, and all pipeline parameters are passed to tasks in the form of `$(params.PARAM_NAME)`.
